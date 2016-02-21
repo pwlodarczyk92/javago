@@ -1,0 +1,47 @@
+apply plugin: 'java'
+apply plugin: 'application'
+mainClassName = 'Main'
+targetCompatibility = "1.8"
+sourceCompatibility = "1.8"
+group = 'pwlodarczyk92.javago'
+version = '0.1'
+
+repositories {
+    mavenCentral()
+}
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'Main'
+    }
+    doFirst {
+        from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+    baseName = 'javago'
+    version =  '0.1.0'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test']
+        }
+    }
+}
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
