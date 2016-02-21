@@ -1,5 +1,3 @@
-package Null;
-
 import org.junit.Test;
 
 /**
