@@ -2,7 +2,7 @@ package core.table;
 
 import core.MoveNotAllowed;
 import core.Stone;
-import core.table.color.Copyable;
+import utils.Copyable;
 import core.table.color.IColor;
 
 import java.util.Collection;
@@ -22,6 +22,11 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements Copyab
 		this.adjacency = adjacency;
 		this.whites = whites;
 		this.blacks = blacks;
+	}
+
+	@Override
+	public Table<F, G, C> copy() {
+		return new Table<>(adjacency, whites.copy(), blacks.copy());
 	}
 
 	public void put(Stone stone, F field) {
@@ -91,9 +96,10 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements Copyab
 		return (19*19) * whites.hashCode() + blacks.hashCode();
 	}
 
-	@Override
-	public Table<F, G, C> copy() {
-		return new Table<>(adjacency, whites.copy(), blacks.copy());
+	public Stone getStone(F field) {
+		if (whites.contains(field)) return Stone.WHITE;
+		if (blacks.contains(field)) return Stone.BLACK;
+		return Stone.EMPTY;
 	}
 
 	public C getWhites() {

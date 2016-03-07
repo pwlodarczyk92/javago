@@ -1,7 +1,7 @@
 package core;
 
 import com.google.common.collect.Collections2;
-import core.table.color.Copyable;
+import utils.Copyable;
 import core.table.color.IColor;
 import org.junit.Before;
 

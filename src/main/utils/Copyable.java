@@ -1,4 +1,4 @@
-package core.table.color;
+package utils;
 
 /**
  * Created by maxus on 03.03.16.

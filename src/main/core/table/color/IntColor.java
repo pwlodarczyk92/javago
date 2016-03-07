@@ -1,5 +1,7 @@
 package core.table.color;
 
+import utils.Copyable;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -28,7 +30,7 @@ public class IntColor extends Color<Integer> implements Copyable<IntColor> {
 			nf.put(f.getKey(), new HashSet<>(f.getValue()));
 		}
 		for (Map.Entry<Integer, HashSet<Integer>> l: liberties.entrySet()) {
-			nf.put(l.getKey(), new HashSet<>(l.getValue()));
+			nl.put(l.getKey(), new HashSet<>(l.getValue()));
 		}
 		return new IntColor(adjacency,
 				new HashMap<>(roots),
