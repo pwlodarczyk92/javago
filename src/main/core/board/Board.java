@@ -13,18 +13,30 @@ import java.util.*;
  */
 public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 
-	private Deque<F> moves = new ArrayDeque<>();
+	private LinkedList<F> moves = new LinkedList<>();
 	private HashSet<Table<F, G, C>> snaps = new HashSet<>();
 	private Deque<Table<F, G, C>> history = new ArrayDeque<>();
 
 	private Table<F, G, C> table;
-	private Stone currstone = Stone.WHITE;
+	protected Stone currstone = Stone.WHITE;
+	protected Integer passcounter = 0;
 
 	public Board(Table<F, G, C> table) {
 		this.table = table;
 	}
 
 	public void put(F field) {
+
+		if (passcounter > 2) {
+			throw new MoveNotAllowed();
+		}
+
+		if (field == null) {
+			moves.add(null);
+			currstone = currstone.opposite();
+			passcounter += 1;
+			return;
+		}
 
 		Table<F, G, C> newtable = this.table.copy();
 
@@ -37,21 +49,34 @@ public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 		snaps.add(newtable);
 		history.add(newtable);
 		currstone = currstone.opposite();
+		passcounter = 0;
 		this.table = newtable;
 
 	}
 
 	public F undo() {
+		passcounter = Math.max(0, passcounter - 1);
+		F lastmove = moves.removeLast();
+		Iterator<F> passes = moves.descendingIterator();
+		while (passes.hasNext()) {
+			F move = passes.next();
+			if (move != null) break;
+			passcounter += 1;
+		}
+
+		if (lastmove != null) {
+			snaps.remove(history.removeLast());
+			table = history.peekLast();
+		}
+
 		currstone = currstone.opposite();
-		snaps.remove(table);
-		history.removeLast();
-		table = history.peekLast();
-		return moves.removeLast();
+		return lastmove;
 	}
 
 	public Table<F, G, C> getTable() {
 		return table;
 	}
+
 	public Stone getStone(F field) {
 		return table.getStone(field);
 	}

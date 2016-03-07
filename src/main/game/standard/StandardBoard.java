@@ -60,8 +60,23 @@ public class StandardBoard extends Board<Integer, Integer, IntColor> implements 
 	}
 
 	@Override
+	public Stone current() {
+		return currstone;
+	}
+
+	@Override
+	public Integer passes() {
+		return passcounter;
+	}
+
+	@Override
 	public void put(int x, int y) {
 		put(field(x, y));
+	}
+
+	@Override
+	public void pass() {
+		put(null);
 	}
 
 }
