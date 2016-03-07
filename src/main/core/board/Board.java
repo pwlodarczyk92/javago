@@ -4,7 +4,7 @@ import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
 import core.table.Table;
 import utils.Copyable;
-import core.table.color.IColor;
+import core.color.IColor;
 
 import java.util.*;
 

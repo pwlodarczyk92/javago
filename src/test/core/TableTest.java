@@ -3,8 +3,8 @@ package core;
 import core.primitives.Stone;
 import core.table.Table;
 import utils.Copyable;
-import core.table.color.IColor;
-import core.table.color.IntColor;
+import core.color.IColor;
+import core.color.IntColor;
 
 import java.util.Arrays;
 import java.util.Collection;

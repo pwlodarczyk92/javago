@@ -2,7 +2,7 @@ package core;
 
 import com.google.common.collect.Collections2;
 import utils.Copyable;
-import core.table.color.IColor;
+import core.color.IColor;
 import org.junit.Before;
 
 import java.util.*;

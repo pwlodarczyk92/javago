@@ -1,4 +1,4 @@
-package core.table.color;
+package core.color;
 
 import java.util.Set;
 

@@ -1,6 +1,6 @@
 package core;
 
-import core.table.color.IntColor;
+import core.color.IntColor;
 
 import java.util.Collection;
 import java.util.function.Function;
