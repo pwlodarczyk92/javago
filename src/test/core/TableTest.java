@@ -1,5 +1,6 @@
 package core;
 
+import core.primitives.Stone;
 import core.table.Table;
 import utils.Copyable;
 import core.table.color.IColor;

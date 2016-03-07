@@ -1,7 +1,7 @@
 package core.table;
 
-import core.MoveNotAllowed;
-import core.Stone;
+import core.primitives.MoveNotAllowed;
+import core.primitives.Stone;
 import utils.Copyable;
 import core.table.color.IColor;
 

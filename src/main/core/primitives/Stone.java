@@ -1,4 +1,4 @@
-package core;
+package core.primitives;
 
 /**
  * Created by maxus on 24.02.16.
