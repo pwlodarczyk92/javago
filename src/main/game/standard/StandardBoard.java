@@ -16,16 +16,18 @@ import java.util.List;
 public class StandardBoard extends Board<Integer, Integer, IntColor> implements GameExtView {
 
 	private static HashMap<Integer, List<Integer>> adjacents = new HashMap<>();
+	private final static int nineteen = 19;
+
 	static {
 		int[] xdifs = {1, 0, -1, 0};
 		int[] ydifs = {0, 1, 0, -1};
-		for(int i=0; i<19; i++) {
-			for(int j=0; j<19; j++) {
+		for(int i=0; i<nineteen; i++) {
+			for(int j=0; j<nineteen; j++) {
 				ArrayList<Integer> adjs = new ArrayList<>();
 				for(int l=0; l<4; l++) {
 					int x = i+xdifs[l];
 					int y = j+ydifs[l];
-					if (0<=x && x<19 && 0<=y && y<19) {
+					if (0<=x && x<nineteen && 0<=y && y<nineteen) {
 						adjs.add(field(x, y));
 					}
 				}
@@ -39,7 +41,7 @@ public class StandardBoard extends Board<Integer, Integer, IntColor> implements 
 	}
 
 	private static Integer field(int x, int y) {
-		return x*19+y;
+		return x*nineteen+y;
 	}
 
 	public Stone get(int x, int y) {
@@ -49,9 +51,9 @@ public class StandardBoard extends Board<Integer, Integer, IntColor> implements 
 	@Override
 	public List<List<Stone>> get() {
 		List<List<Stone>> columns = new ArrayList<>();
-		for(int i=0; i<18; i++) {
+		for(int i=0; i<nineteen; i++) {
 			ArrayList<Stone> column = new ArrayList<>();
-			for (int j = 0; j < 18; j++) {
+			for (int j = 0; j < nineteen; j++) {
 				column.add(get(i, j));
 			}
 			columns.add(column);
@@ -77,6 +79,10 @@ public class StandardBoard extends Board<Integer, Integer, IntColor> implements 
 	@Override
 	public void pass() {
 		put(null);
+	}
+
+	public void undo() {
+		retract();
 	}
 
 }
