@@ -39,31 +39,33 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements Copyab
 		}
 
 		Collection<F> adjacent = adjacency.apply(field);
-		boolean free = false;
+		boolean moveok = false;
 
 		for (F adj : adjacent) {
 			boolean playeradj = player.contains(adj);
 			boolean enemyadj = enemy.contains(adj);
 
-			if (!enemyadj && !playeradj) free = true;
+			if (!enemyadj && !playeradj) moveok = true;
 
-			else if (enemy.contains(adj) && getlibs(enemy, player, adj).size()==1) {
-				free = true;
+			else if (enemyadj && getlibs(enemy, player, adj).size()==1) {
+				moveok = true;
 				enemy.remgroup(enemy.getgroup(adj));
 			}
+
 		}
 
-		if (!free) {
+		if (!moveok) {
 			for (F adj : adjacent) {
-				boolean playeradj = player.contains(adj);
-				if (playeradj) {
-					Collection<F> playercol = getlibs(player, enemy, adj);
-					if (playercol.size()==1) {
-						throw new MoveNotAllowed();
-					}
+				if (player.contains(adj) && getlibs(player, enemy, adj).size()>1) {
+					moveok = true;
+					break;
+					//TODO: add tests for correctness of this check
+					//TODO: older check threw exception if getlibs().size()==1, which is wrong
 				}
 			}
 		}
+
+		if (!moveok) throw new MoveNotAllowed();
 
 		player.addstone(field);
 
