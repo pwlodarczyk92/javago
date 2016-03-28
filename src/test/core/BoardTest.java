@@ -50,10 +50,10 @@ public abstract class BoardTest<G, C extends IColor<Integer, G> & Copyable<C>, B
 			fail = true;
 		}
 		assert fail;
-		board.undo(); //BBB WB B
-		board.undo(); //BBB WB
-		board.undo(); //BBB  B
-		board.undo(); //BBWWW
+		board.undoput(); //BBB WB B
+		board.undoput(); //BBB WB
+		board.undoput(); //BBB  B
+		board.undoput(); //BBWWW
 		assert board.getTable().equals(oldtable);
 	}
 

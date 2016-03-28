@@ -82,7 +82,7 @@ public class StandardBoard extends Board<Integer, Integer, IntColor> implements 
 	}
 
 	public void undo() {
-		retract();
+		undoput();
 	}
 
 }

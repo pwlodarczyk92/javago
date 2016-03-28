@@ -23,6 +23,7 @@ public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 
 	public Board(Table<F, G, C> table) {
 		this.table = table;
+		this.history.add(table);
 	}
 
 	public void put(F field) {
@@ -54,9 +55,18 @@ public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 
 	}
 
-	public F undo() {
-		passcounter = Math.max(0, passcounter - 1);
+	public F undoput() {
+
 		F lastmove = moves.removeLast();
+		currstone = currstone.opposite();
+
+		if (lastmove != null) {
+			Table<F, G, C> lasttable = history.removeLast();
+			snaps.remove(lasttable);
+			table = history.peekLast();
+		}
+
+		passcounter = 0;
 		Iterator<F> passes = moves.descendingIterator();
 		while (passes.hasNext()) {
 			F move = passes.next();
@@ -64,13 +74,8 @@ public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 			passcounter += 1;
 		}
 
-		if (lastmove != null) {
-			snaps.remove(history.removeLast());
-			table = history.peekLast();
-		}
-
-		currstone = currstone.opposite();
 		return lastmove;
+
 	}
 
 	public Table<F, G, C> getTable() {

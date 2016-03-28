@@ -42,10 +42,17 @@ public abstract class Color<Field> implements IColor<Field, Field>{
 
 	//--interface--
 	@Override
-	public boolean contains(Field node) {
-		return this.roots.containsKey(node);
+	public Set<Field> getlibs(Field root) {
+		return liberties.get(root);
 	}
-
+	@Override
+	public Set<Field> getnodes(Field root) {
+		return families.get(root);
+	}
+	@Override
+	public Set<Field> allstones() {
+		return roots.keySet();
+	}
 	@Override
 	public Field getgroup(Field node) {
 		Field nroot = this.roots.get(node);
@@ -57,6 +64,10 @@ public abstract class Color<Field> implements IColor<Field, Field>{
 		//assert this.getgroup(froot) == froot;
 		//yo dawg, i herd you like recursion
 		return froot;
+	}
+	@Override
+	public boolean contains(Field node) {
+		return this.roots.containsKey(node);
 	}
 
 	@Override
@@ -95,23 +106,14 @@ public abstract class Color<Field> implements IColor<Field, Field>{
 		return root;
 
 	}
-	@Override
-	public Set<Field> getlibs(Field root) {
-		return liberties.get(root);
-	}
-	@Override
-	public Set<Field> allstones() {
-		return roots.keySet();
-	}
-	@Override
-	public Set<Field> getnodes(Field root) {
-		return families.get(root);
-	}
+
 	//--interface--
 
 	// --union--
 	// compose, merge and makeSingleton should be considered together with add:
 	// invoking these functions separately leaves inconsistent state
+
+	// merges disjoint sets that are supposed to be connected
 	private Field merge(Field root1, Field root2) {
 
 		assert !root1.equals(root2);
@@ -131,16 +133,19 @@ public abstract class Color<Field> implements IColor<Field, Field>{
 		}
 		return nroot;
 	}
+
 	private Field compose(Field subroot, Field superroot) {
 		this.roots.put(subroot, superroot);
 		this.families.get(superroot).addAll(this.families.get(subroot));
 		this.liberties.get(superroot).addAll(this.liberties.get(subroot));
+
 		this.families.remove(subroot);
 		this.liberties.remove(subroot);
 		this.ranks.remove(subroot);
 		return superroot;
 	}
 
+	// creates single element disjoint set, assuming it's not connected
 	private void makeSingleton(Field node) {
 
 		assert !roots.containsKey(node);
