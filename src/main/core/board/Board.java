@@ -2,7 +2,9 @@ package core.board;
 
 import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
+import core.table.ITable;
 import core.table.Table;
+import core.table.TableView;
 import utils.Copyable;
 import core.color.IColor;
 
@@ -11,17 +13,17 @@ import java.util.*;
 /**
  * Created by maxus on 24.02.16.
  */
-public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
+public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends TableView<F, G>> {
 
 	private LinkedList<F> moves = new LinkedList<>();
-	private HashSet<Table<F, G, C>> snaps = new HashSet<>();
-	private Deque<Table<F, G, C>> history = new ArrayDeque<>();
+	private HashSet<T> snaps = new HashSet<>();
+	private Deque<T> history = new ArrayDeque<>();
 
-	private Table<F, G, C> table;
+	private T table;
 	protected Stone currstone = Stone.WHITE;
 	protected Integer passcounter = 0;
 
-	public Board(Table<F, G, C> table) {
+	public Board(T table) {
 		this.table = table;
 		this.history.add(table);
 	}
@@ -39,7 +41,7 @@ public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 			return;
 		}
 
-		Table<F, G, C> newtable = this.table.copy();
+		T newtable = this.table.copy();
 
 		newtable.put(currstone, field);
 		if (snaps.contains(newtable)) {
@@ -61,7 +63,7 @@ public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 		currstone = currstone.opposite();
 
 		if (lastmove != null) {
-			Table<F, G, C> lasttable = history.removeLast();
+			T lasttable = history.removeLast();
 			snaps.remove(lasttable);
 			table = history.peekLast();
 		}
@@ -78,12 +80,8 @@ public class Board<F, G, C extends IColor<F, G> & Copyable<C>> {
 
 	}
 
-	public Table<F, G, C> getTable() {
-		return table;
-	}
-
-	public Stone getStone(F field) {
-		return table.getStone(field);
+	public V tableview() {
+		return table.getview();
 	}
 
 }

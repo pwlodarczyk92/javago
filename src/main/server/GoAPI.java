@@ -3,7 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import game.GameExtView;
-import game.standard.StandardBoard;
+import core.board.StandardBoard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;

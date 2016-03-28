@@ -1,5 +1,6 @@
 package core.table;
 
+import core.color.ColorView;
 import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
 import utils.Copyable;
@@ -7,16 +8,18 @@ import core.color.IColor;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
  * Created by maxus on 23.02.16.
  */
-public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements Copyable<Table<F, G, C>> {
 
-	private Function<F, Collection<F>> adjacency;
-	private C whites;
-	private C blacks;
+public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable<F, G, TableView<F, G>> {
+
+	protected Function<F, Collection<F>> adjacency;
+	protected C whites;
+	protected C blacks;
 
 	public Table(Function<F, Collection<F>> adjacency, C whites, C blacks) {
 		this.adjacency = adjacency;
@@ -24,11 +27,59 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements Copyab
 		this.blacks = blacks;
 	}
 
+	//--accessors--
 	@Override
-	public Table<F, G, C> copy() {
-		return new Table<>(adjacency, whites.copy(), blacks.copy());
+	public Stone getstone(F field) {
+		if (whites.contains(field)) return Stone.WHITE;
+		if (blacks.contains(field)) return Stone.BLACK;
+		return Stone.EMPTY;
 	}
 
+	@Override
+	public Set<F> getlibs(Stone s, G group) {
+		switch (s) {
+			case WHITE: return getlibs_bygroup(whites, blacks, group);
+			case BLACK: return getlibs_bygroup(blacks, whites, group);
+			default: throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public TableView<F, G> getview() {
+		return this;
+	}
+
+	@Override
+	public ColorView<F, G> getview(Stone s) {
+		switch (s) {
+			case WHITE: return whites;
+			case BLACK: return blacks;
+			default: throw new RuntimeException();
+		}
+	}
+	//--accessors--
+
+	private Set<F> getlibs_bygroup(C main, C substract, G group) {
+
+		HashSet<F> result = new HashSet<>();
+
+		for (F lib: main.getlibs(group)) {
+			if (!substract.contains(lib))
+				result.add(lib);
+		}
+
+		return result;
+
+	}
+
+	private Set<F> getlibs(C main, C substract, F field) {
+
+		return getlibs_bygroup(main, substract, main.getgroup(field));
+
+	}
+
+
+	@Override
 	public void put(Stone stone, F field) {
 
 		C player = stone == Stone.BLACK ? blacks : whites;
@@ -71,14 +122,7 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements Copyab
 
 	}
 
-	private Collection<F> getlibs(C main, C substract, F f) {
-		HashSet<F> result = new HashSet<>();
-		for (F lib: main.getlibs(main.getgroup(f))) {
-			if (!substract.contains(lib))
-				result.add(lib);
-		}
-		return result;
-	}
+
 
 	@Override
 	public boolean equals(Object o) {
@@ -98,18 +142,6 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements Copyab
 		return (19*19) * whites.hashCode() + blacks.hashCode();
 	}
 
-	public Stone getStone(F field) {
-		if (whites.contains(field)) return Stone.WHITE;
-		if (blacks.contains(field)) return Stone.BLACK;
-		return Stone.EMPTY;
-	}
 
-	public C getWhites() {
-		return whites;
-	}
-
-	public C getBlacks() {
-		return blacks;
-	}
 
 }

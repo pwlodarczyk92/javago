@@ -17,9 +17,8 @@ public class IntColor extends Color<Integer> implements Copyable<IntColor> {
 	protected IntColor(Function<Integer, Collection<Integer>> adjacency,
 					HashMap<Integer, Integer> roots,
 					HashMap<Integer, HashSet<Integer>> families,
-					HashMap<Integer, HashSet<Integer>> liberties,
-					HashMap<Integer, Integer> ranks) {
-		super(adjacency, roots, families, liberties, ranks);
+					HashMap<Integer, HashSet<Integer>> liberties) {
+		super(adjacency, roots, families, liberties);
 	}
 
 	@Override
@@ -35,8 +34,7 @@ public class IntColor extends Color<Integer> implements Copyable<IntColor> {
 		return new IntColor(adjacency,
 				new HashMap<>(roots),
 				nf,
-				nl,
-				new HashMap<>(ranks));
+				nl);
 	}
 
 	@Override
@@ -53,4 +51,5 @@ public class IntColor extends Color<Integer> implements Copyable<IntColor> {
 	public int hashCode() {
 		return roots.size() + (19*19*19*19) * families.size();
 	}
+
 }

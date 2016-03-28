@@ -1,5 +1,6 @@
 package core;
 
+import core.color.ColorView;
 import core.primitives.Stone;
 import core.table.Table;
 import utils.Copyable;
@@ -30,8 +31,8 @@ public abstract class TableTest<G, C extends IColor<Integer,G> & Copyable<C>, T 
 	@org.junit.Test
 	public final void simpleTest() {
 		T table = createInstance(adj, new IntColor(adj), new IntColor(adj));
-		C w = table.getWhites();
-		C b = table.getBlacks();
+		ColorView<Integer, G> w = table.getview(Stone.WHITE);
+		ColorView<Integer, G> b = table.getview(Stone.BLACK);
 
 		table.put(Stone.WHITE, 1);
 		assert w.allstones().equals(mkset(1));

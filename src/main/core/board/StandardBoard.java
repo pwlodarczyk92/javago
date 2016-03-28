@@ -1,9 +1,11 @@
-package game.standard;
+package core.board;
 
 import core.primitives.Stone;
 import core.board.Board;
+import core.table.IntTable;
 import core.table.Table;
 import core.color.IntColor;
+import core.table.TableView;
 import game.GameExtView;
 
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ import java.util.List;
 /**
  * Created by maxus on 06.03.16.
  */
-public class StandardBoard extends Board<Integer, Integer, IntColor> implements GameExtView {
+public class StandardBoard extends IntBoard implements GameExtView {
 
 	private static HashMap<Integer, List<Integer>> adjacents = new HashMap<>();
 	private final static int nineteen = 19;
@@ -37,7 +39,7 @@ public class StandardBoard extends Board<Integer, Integer, IntColor> implements 
 	}
 
 	public StandardBoard() {
-		super(new Table<>(adjacents::get, new IntColor(adjacents::get), new IntColor(adjacents::get)));
+		super(new IntTable(adjacents::get, new IntColor(adjacents::get), new IntColor(adjacents::get)));
 	}
 
 	private static Integer field(int x, int y) {
@@ -45,7 +47,7 @@ public class StandardBoard extends Board<Integer, Integer, IntColor> implements 
 	}
 
 	public Stone get(int x, int y) {
-		return getStone(field(x, y));
+		return tableview().getstone(field(x, y));
 	}
 
 	@Override
