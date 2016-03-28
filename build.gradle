@@ -18,6 +18,8 @@ dependencies {
     compile group: 'com.sparkjava', name: 'spark-core', version: '2.3'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.19'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.6'
 }
 
 jar {
@@ -37,12 +39,15 @@ sourceSets {
             srcDirs = ['src/main']
         }
         resources {
-            srcDirs = ["resources"]
+            srcDirs = ["resources/main"]
         }
     }
     test {
         java {
             srcDirs = ['src/test']
+        }
+        resources {
+            srcDirs = ["resources/test"]
         }
     }
 }

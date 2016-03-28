@@ -18,9 +18,12 @@ public interface GameExtView {
 
 	public void put(int x, int y);
 	public void pass();
+	public void undo();
+
 	public List<List<Stone>> get();
 	public Stone current();
 	public Integer passes();
+
 	public default State state() {
 		State result = new State();
 		result.passes = passes();
