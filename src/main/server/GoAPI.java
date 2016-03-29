@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import core.board.StandardBoard;
+import core.primitives.MoveNotAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -85,19 +86,23 @@ public class GoAPI {
 		GameExtView game = games.get(id);
 		JsonObject jbody = parser.fromJson(body, JsonObject.class);
 		String action = parser.fromJson(jbody.get("action"), String.class);
-		switch (action) {
-			case "pass":
-				game.pass();
-				break;
-			case "undo":
-				game.undo();
-				break;
-			case "move":
-				Position pos = parser.fromJson(jbody.get("position"), Position.class);
-				game.put(pos.x, pos.y);
-				break;
-			default:
-				res.status(404);
+		try {
+			switch (action) {
+				case "pass":
+					game.pass();
+					break;
+				case "undo":
+					game.undo();
+					break;
+				case "move":
+					Position pos = parser.fromJson(jbody.get("position"), Position.class);
+					game.put(pos.x, pos.y);
+					break;
+				default:
+					res.status(404);
+			}
+		} catch (MoveNotAllowed e) {
+			res.status(400);
 		}
 		return "{}";
 	}
