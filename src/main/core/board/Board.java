@@ -3,10 +3,8 @@ package core.board;
 import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
 import core.table.ITable;
-import core.table.Table;
 import core.table.TableView;
 import utils.Copyable;
-import core.color.IColor;
 
 import java.util.*;
 
@@ -83,5 +81,5 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 	public V tableview() {
 		return table.getview();
 	}
-
+	public T tablecopy() { return table.copy(); }
 }

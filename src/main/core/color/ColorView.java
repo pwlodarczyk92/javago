@@ -11,6 +11,7 @@ public interface ColorView<F, G> {
 	public Set<F> getnodes(G group);
 	public Set<F> allstones();
 	public Set<G> getgroups();
+	public Set<F> getlibs(G group);
 	public default boolean contains(F node) {
 		return allstones().contains(node);
 	}

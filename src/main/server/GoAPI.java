@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import game.GameExtView;
 import core.board.StandardBoard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,7 @@ import java.util.HashMap;
  */
 public class GoAPI {
 
-	final Logger logger = LoggerFactory.getLogger(this.getClass());
+	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private HashMap<String, GameExtView> games = new HashMap<>();
 	private Gson parser = new Gson();
 	private class Position {

@@ -1,12 +1,9 @@
 package core.board;
 
 import core.primitives.Stone;
-import core.board.Board;
 import core.table.IntTable;
-import core.table.Table;
 import core.color.IntColor;
-import core.table.TableView;
-import game.GameExtView;
+import server.GameExtView;
 
 import java.util.ArrayList;
 import java.util.HashMap;

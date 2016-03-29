@@ -122,9 +122,8 @@ public abstract class Color<Field> implements IColor<Field, Field>{
 
 		for (Field adjroot: checkedroots) {
 
-			maxliberties.addAll(liberties.get(adjroot));
-
-			HashSet<Field> nowfam = families.get(adjroot);
+			maxliberties.addAll(liberties.remove(adjroot));
+			HashSet<Field> nowfam = families.remove(adjroot);
 			maxfamily.addAll(nowfam);
 
 			for (Field n: nowfam)
