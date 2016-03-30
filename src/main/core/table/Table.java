@@ -17,11 +17,13 @@ import java.util.function.Function;
 
 public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable<F, G, TableView<F, G>> {
 
+	protected Collection<F> fields;
 	protected Function<F, Collection<F>> adjacency;
 	protected C whites;
 	protected C blacks;
 
-	public Table(Function<F, Collection<F>> adjacency, C whites, C blacks) {
+	public Table(Collection<F> fields, Function<F, Collection<F>> adjacency, C whites, C blacks) {
+		this.fields = fields;
 		this.adjacency = adjacency;
 		this.whites = whites;
 		this.blacks = blacks;
@@ -56,6 +58,15 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 			case BLACK: return blacks;
 			default: throw new RuntimeException();
 		}
+	}
+
+	@Override
+	public Collection<F> getfields() {
+		return fields;
+	}
+	@Override
+	public Function<F, Collection<F>> getadjacency() {
+		return adjacency;
 	}
 	//--accessors--
 

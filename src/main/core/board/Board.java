@@ -100,7 +100,12 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	public Stone currentstone() {
+		return currstone;
+	}
+	public Integer passes() {
+		return passcounter;
+	}
 	public List<F> moves() {
 		return Collections.unmodifiableList(moves);
 	}

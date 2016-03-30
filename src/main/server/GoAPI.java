@@ -24,10 +24,6 @@ public class GoAPI {
 		public int y;
 	}
 
-	//private void log(String info) {
-	//	System.out.println(info);
-	//}
-
 	public String get(Request req, Response res) {
 
 		logger.info("GET: {}", req.queryString());

@@ -21,20 +21,21 @@ public interface GameExtView {
 	public void put(int x, int y);
 	public void pass();
 	public void undo();
+
 	public int blackpts();
 	public int whitepts();
 
-	public List<List<Stone>> get();
+	public List<List<Stone>> getstones();
 	public Stone current();
-	public Integer passes();
+	public Integer passcount();
 
 	public default State state() {
 		State result = new State();
-		result.passes = passes();
+		result.passes = passcount();
 		result.current = current().val;
 		result.blackpoints = blackpts();
 		result.whitepoints = whitepts();
-		result.stones = get().stream().map(
+		result.stones = getstones().stream().map(
 				column -> column.stream().map(s -> s.val).collect(Collectors.toList())
 				).collect(Collectors.toList());
 		return result;
