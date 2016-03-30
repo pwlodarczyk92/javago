@@ -80,8 +80,9 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 
 
 	@Override
-	public void put(Stone stone, F field) {
+	public Set<F> put(Stone stone, F field) {
 
+		HashSet<F> removed_stones = new HashSet<>();
 		C player = stone == Stone.BLACK ? blacks : whites;
 		C enemy = stone == Stone.BLACK ? whites : blacks;
 
@@ -100,7 +101,7 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 
 			else if (enemyadj && getlibs(enemy, player, adj).size()==1) {
 				moveok = true;
-				enemy.remgroup(enemy.getgroup(adj));
+				removed_stones.addAll(enemy.remgroup(enemy.getgroup(adj)));
 			}
 
 		}
@@ -119,6 +120,7 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 		if (!moveok) throw new MoveNotAllowed();
 
 		player.addstone(field);
+		return removed_stones;
 
 	}
 

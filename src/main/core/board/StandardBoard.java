@@ -39,7 +39,7 @@ public class StandardBoard extends IntBoard implements GameExtView {
 		super(new IntTable(adjacents::get, new IntColor(adjacents::get), new IntColor(adjacents::get)));
 	}
 
-	private static Integer field(int x, int y) {
+	public static Integer field(int x, int y) {
 		return x*nineteen+y;
 	}
 
@@ -84,4 +84,13 @@ public class StandardBoard extends IntBoard implements GameExtView {
 		undoput();
 	}
 
+	@Override
+	public int blackpts() {
+		return points(Stone.BLACK);
+	}
+
+	@Override
+	public int whitepts() {
+		return points(Stone.WHITE);
+	}
 }

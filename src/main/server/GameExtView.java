@@ -14,11 +14,15 @@ public interface GameExtView {
 		public List<List<Integer>> stones;
 		public Integer current;
 		public Integer passes;
+		public Integer whitepoints;
+		public Integer blackpoints;
 	}
 
 	public void put(int x, int y);
 	public void pass();
 	public void undo();
+	public int blackpts();
+	public int whitepts();
 
 	public List<List<Stone>> get();
 	public Stone current();
@@ -28,9 +32,11 @@ public interface GameExtView {
 		State result = new State();
 		result.passes = passes();
 		result.current = current().val;
+		result.blackpoints = blackpts();
+		result.whitepoints = whitepts();
 		result.stones = get().stream().map(
-				column -> column.stream().map(s -> s.val).collect(Collectors.toList()))
-				.collect(Collectors.toList());
+				column -> column.stream().map(s -> s.val).collect(Collectors.toList())
+				).collect(Collectors.toList());
 		return result;
 	}
 }

@@ -16,6 +16,8 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 	private LinkedList<F> moves = new LinkedList<>();
 	private HashSet<T> snaps = new HashSet<>();
 	private Deque<T> history = new ArrayDeque<>();
+	private Deque<Integer> blackpoints = new ArrayDeque<>();
+	private Deque<Integer> whitepoints = new ArrayDeque<>();
 
 	private T table;
 	protected Stone currstone = Stone.WHITE;
@@ -24,6 +26,8 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 	public Board(T table) {
 		this.table = table;
 		this.history.add(table);
+		this.blackpoints.add(0);
+		this.whitepoints.add(0);
 	}
 
 	public void put(F field) {
@@ -41,7 +45,7 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 
 		T newtable = this.table.copy();
 
-		newtable.put(currstone, field);
+		int points = newtable.put(currstone, field).size();
 		if (snaps.contains(newtable)) {
 			throw new MoveNotAllowed(); //positional super-ko rule
 		}
@@ -49,6 +53,11 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 		moves.add(field);
 		snaps.add(newtable);
 		history.add(newtable);
+		switch (currstone) {
+			case WHITE: whitepoints.add(whitepoints.peek()+points); break;
+			case BLACK: blackpoints.add(blackpoints.peek()+points); break;
+			default: throw new RuntimeException();
+		}
 		currstone = currstone.opposite();
 		passcounter = 0;
 		this.table = newtable;
@@ -64,6 +73,11 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 			T lasttable = history.removeLast();
 			snaps.remove(lasttable);
 			table = history.peekLast();
+			switch (currstone) {
+				case WHITE: whitepoints.removeLast(); break;
+				case BLACK: blackpoints.removeLast(); break;
+				default: throw new RuntimeException();
+			}
 		}
 
 		passcounter = 0;
@@ -76,6 +90,19 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 
 		return lastmove;
 
+	}
+
+	public int points(Stone stone) {
+		switch (stone) {
+			case WHITE: return whitepoints.peekLast();
+			case BLACK: return blackpoints.peekLast();
+			default: throw new RuntimeException();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<F> moves() {
+		return Collections.unmodifiableList(moves);
 	}
 
 	public V tableview() {
