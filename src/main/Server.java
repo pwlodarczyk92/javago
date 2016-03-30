@@ -38,7 +38,7 @@ public class Server {
 	private static void enableCORS(final String origin, final String methods, final String headers) {
 		before((request, response) -> {
 			response.header("Access-Control-Allow-Origin", origin);
-			response.header("Access-Control-Request-Method", methods);
+			response.header("Access-Control-Allow-Methods", methods);
 			response.header("Access-Control-Allow-Headers", headers);
 		});
 	}
@@ -47,12 +47,12 @@ public class Server {
 
 		running = true;
 		port(config.port);
-		if (!config.cors) enableCORS("*", "*", "*");
+		if (!config.cors) enableCORS("*", "GET, POST, PUT, DELETE", "*");
 		get(config.path, api::get);
 		put(config.path, api::put);
 		post(config.path, api::post);
 		delete(config.path, api::delete);
-
+		options(config.path, (req, res) -> "{}");
 	}
 
 }

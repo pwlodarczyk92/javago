@@ -48,11 +48,12 @@ public class GoAPI {
 		logger.info("PUT: {}", req.queryString());
 		String id = req.queryParams("id");
 		if (id == null || games.containsKey(id)) {
-			res.status(id == null ? 404 : 405);
+			res.status(id == null ? 404 : 200);
 			return "{}";
 		}
 
 		games.put(id, new StandardBoard());
+		res.status(201);
 		return "{}";
 
 	}

@@ -19,8 +19,7 @@ public class Main {
 		Server.Config config = new Server.Config();
 		config.port = Integer.parseInt(props.getProperty("PORT"));
 		config.cors = Boolean.parseBoolean(props.getProperty("CORS"));
-		config.path = props.getProperty("PATH" +
-				"");
+		config.path = props.getProperty("PATH");
 
 		Server s = Server.getServer();
 		s.configure(config);
