@@ -3,12 +3,13 @@ package server;
 import core.primitives.Stone;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Created by maxus on 07.03.16.
  */
-public interface GameExtView {
+public interface GameExtView<F> {
 
 	public static class State {
 		public List<List<Integer>> stones;
@@ -25,19 +26,27 @@ public interface GameExtView {
 	public int blackpts();
 	public int whitepts();
 
-	public List<List<Stone>> getstones();
-	public Stone current();
+	public List<List<F>> getfields();
+	public Map<F, Stone> getstones();
+	public Stone currentstone();
 	public Integer passcount();
 
 	public default State state() {
 		State result = new State();
-		result.passes = passcount();
-		result.current = current().val;
-		result.blackpoints = blackpts();
-		result.whitepoints = whitepts();
-		result.stones = getstones().stream().map(
-				column -> column.stream().map(s -> s.val).collect(Collectors.toList())
-				).collect(Collectors.toList());
+		updateState(result);
 		return result;
 	}
+
+	public default void updateState(State result) {
+		Map<F, Stone> stones = getstones();
+		result.passes = passcount();
+		result.current = currentstone().val;
+		result.blackpoints = blackpts();
+		result.whitepoints = whitepts();
+		result.stones = getfields().stream().map(
+				column -> column.stream().map(f -> stones.get(f).val).collect(Collectors.toList())
+		).collect(Collectors.toList());
+
+	}
+
 }

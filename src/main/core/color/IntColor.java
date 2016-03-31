@@ -1,14 +1,15 @@
 package core.color;
 
-import utils.Copyable;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
  * Created by maxus on 28.02.16.
  */
-public class IntColor extends Color<Integer> implements Copyable<IntColor> {
+public class IntColor extends Color<Integer> {
 
 	public IntColor(Function<Integer, Collection<Integer>> adjacency) {
 		super(adjacency);
@@ -34,22 +35,8 @@ public class IntColor extends Color<Integer> implements Copyable<IntColor> {
 		return new IntColor(adjacency,
 				new HashMap<>(roots),
 				nf,
-				nl);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		IntColor intColor = (IntColor) o;
-
-		return intColor.roots.keySet().equals(roots.keySet());
-	}
-
-	@Override
-	public int hashCode() {
-		return roots.size() + (19*19*19*19) * families.size();
+				nl) {
+		};
 	}
 
 }

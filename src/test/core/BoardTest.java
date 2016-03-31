@@ -1,11 +1,8 @@
 package core;
 
 import core.board.Board;
-import core.primitives.MoveNotAllowed;
-import core.table.TableView;
-import utils.Copyable;
-import core.color.IColor;
 import core.color.IntColor;
+import core.primitives.MoveNotAllowed;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +11,7 @@ import java.util.function.Function;
 /**
  * Created by maxus on 04.03.16.
  */
-public abstract class BoardTest<B extends Board<Integer, ?, ?, ?>> {
+public abstract class BoardTest<B extends Board<Integer, ?>> {
 
 	private static class LinAdj implements Function<java.lang.Integer, Collection<java.lang.Integer>> {
 		@Override
@@ -57,10 +54,10 @@ public abstract class BoardTest<B extends Board<Integer, ?, ?, ?>> {
 		}
 		assert fail;
 
-		board.undoput(); //BBB WB B
-		board.undoput(); //BBB WB
-		board.undoput(); //BBB  B
-		board.undoput(); //BBWWW
+		board.undo(); //BBB WB B
+		board.undo(); //BBB WB
+		board.undo(); //BBB  B
+		board.undo(); //BBWWW
 		assert board.tableview().equals(oldboard.tableview());
 	}
 

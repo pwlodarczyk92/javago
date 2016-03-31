@@ -1,19 +1,18 @@
 package core.table;
 
 import core.primitives.Stone;
+import utils.Copyable;
 
-import java.util.Collection;
 import java.util.Set;
-import java.util.function.Function;
 
 
 /**
  * Created by maxus on 28.03.16.
  */
-public interface ITable<F, G, V extends TableView<F, G>> extends TableView<F, G> {
-
+public interface ITable<F, G> extends TableView<F, G>, Copyable<ITable<F, G>> {
 
 	public Set<F> put(Stone stone, F field);
-	public V getview();
+	public ITable<F, G> copy();
+	public TableView<F, G> getview();
 
 }

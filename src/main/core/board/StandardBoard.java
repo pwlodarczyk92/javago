@@ -1,8 +1,8 @@
 package core.board;
 
+import core.color.IntColor;
 import core.primitives.Stone;
 import core.table.IntTable;
-import core.color.IntColor;
 import server.GameExtView;
 
 import java.util.ArrayList;
@@ -14,25 +14,29 @@ import java.util.function.Function;
 /**
  * Created by maxus on 06.03.16.
  */
-public class StandardBoard extends IntBoard implements GameExtView {
+public class StandardBoard implements GameExtView<Integer> {
 
 	private final static int nineteen = 19;
 
 	private static ArrayList<Integer> fields = new ArrayList<>();
+	private static List<List<Integer>> fieldtable = new ArrayList<>();
 	private static Integer[] x = new Integer[nineteen*nineteen];
 	private static Integer[] y = new Integer[nineteen*nineteen];
 
 	private static HashMap<Integer, List<Integer>> adjacents = new HashMap<>();
 
+	protected final IntBoard board;
 
 	static {
 		int[] xdifs = {1, 0, -1, 0};
 		int[] ydifs = {0, 1, 0, -1};
 		for(int i=0; i<nineteen; i++) {
+			ArrayList<Integer> column = new ArrayList<>();
 			for(int j=0; j<nineteen; j++) {
 
 				Integer f = field(i, j);
 				fields.add(f);
+				column.add(f);
 				x[f] = i;
 				y[f] = j;
 
@@ -46,11 +50,16 @@ public class StandardBoard extends IntBoard implements GameExtView {
 				}
 				adjacents.put(field(i, j), adjs);
 			}
+			fieldtable.add(column);
 		}
 	}
 
+	protected IntBoard makeboard() {
+		return new IntBoard(new IntTable(fields, adjacents::get, new IntColor(adjacents::get), new IntColor(adjacents::get)));
+	}
+
 	public StandardBoard() {
-		super(new IntTable(fields, adjacents::get, new IntColor(adjacents::get), new IntColor(adjacents::get)));
+		this.board = makeboard();
 	}
 
 	public static Integer field(int x, int y) {
@@ -69,57 +78,57 @@ public class StandardBoard extends IntBoard implements GameExtView {
 	}
 
 	public Stone getstone(Integer field) {
-		return tableview().getstone(field);
+		return board.tableview().getstone(field);
 	}
 
-
 	@Override
-	public List<List<Stone>> getstones() {
-		List<List<Stone>> columns = new ArrayList<>();
-		for(int i=0; i<nineteen; i++) {
-			ArrayList<Stone> column = new ArrayList<>();
-			for (int j = 0; j < nineteen; j++) {
-				column.add(getstone(i, j));
-			}
-			columns.add(column);
+	public HashMap<Integer, Stone> getstones() {
+		HashMap<Integer, Stone> result = new HashMap<>();
+		for(Integer i: fields) {
+			result.put(i, getstone(i));
 		}
-		return columns;
+		return result;
 	}
 
 	@Override
-	public Stone current() {
-		return currentstone();
+	public Stone currentstone() {
+		return board.currentstone();
 	}
 
 	@Override
 	public Integer passcount() {
-		return passes();
+		return board.passcount();
 	}
 
 	@Override
 	public void undo() {
-		undoput();
+		board.undo();
 	}
 
 	@Override
 	public int blackpts() {
-		return points(Stone.BLACK);
+		return board.points(Stone.BLACK);
 	}
 
 	@Override
 	public int whitepts() {
-		return points(Stone.WHITE);
+		return board.points(Stone.WHITE);
+	}
+
+	@Override
+	public List<List<Integer>> getfields() {
+		return fieldtable;
 	}
 
 
 	@Override
 	public void put(int x, int y) {
-		put(field(x, y));
+		board.put(field(x, y));
 	}
 
 	@Override
 	public void pass() {
-		put(null);
+		board.put(null);
 	}
 
 

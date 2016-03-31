@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.function.Function;
 
 
-public class ColorTest extends IntColorTest<Integer, IntColor> {
+public class ColorTest extends IntColorTest<Integer> {
 
 	@Override
 	protected IntColor createInstance(Function<Integer, Collection<Integer>> adjacency) {

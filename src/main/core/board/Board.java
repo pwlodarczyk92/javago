@@ -2,28 +2,27 @@ package core.board;
 
 import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
-import core.table.ITable;
+import core.table.Table;
 import core.table.TableView;
-import utils.Copyable;
 
 import java.util.*;
 
 /**
  * Created by maxus on 24.02.16.
  */
-public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends TableView<F, G>> {
+public class Board<F, G> {
 
 	private LinkedList<F> moves = new LinkedList<>();
-	private HashSet<T> snaps = new HashSet<>();
-	private Deque<T> history = new ArrayDeque<>();
+	private HashSet<Table<F, G>> snaps = new HashSet<>();
+	private Deque<Table<F, G>> history = new ArrayDeque<>();
 	private Deque<Integer> blackpoints = new ArrayDeque<>();
 	private Deque<Integer> whitepoints = new ArrayDeque<>();
 
-	private T table;
+	private Table<F, G> table;
 	protected Stone currstone = Stone.WHITE;
 	protected Integer passcounter = 0;
 
-	public Board(T table) {
+	public Board(Table<F, G> table) {
 		this.table = table;
 		this.history.add(table);
 		this.blackpoints.add(0);
@@ -43,7 +42,7 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 			return;
 		}
 
-		T newtable = this.table.copy();
+		Table<F, G> newtable = this.table.copy();
 
 		int points = newtable.put(currstone, field).size();
 		if (snaps.contains(newtable)) {
@@ -64,13 +63,13 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 
 	}
 
-	public F undoput() {
+	public F undo() {
 
 		F lastmove = moves.removeLast();
 		currstone = currstone.opposite();
 
 		if (lastmove != null) {
-			T lasttable = history.removeLast();
+			Table<F, G> lasttable = history.removeLast();
 			snaps.remove(lasttable);
 			table = history.peekLast();
 			switch (currstone) {
@@ -103,15 +102,15 @@ public class Board<F, G, T extends ITable<F, G, V> & Copyable<T>, V extends Tabl
 	public Stone currentstone() {
 		return currstone;
 	}
-	public Integer passes() {
+	public Integer passcount() {
 		return passcounter;
 	}
 	public List<F> moves() {
 		return Collections.unmodifiableList(moves);
 	}
 
-	public V tableview() {
+	public TableView<F, G> tableview() {
 		return table.getview();
 	}
-	public T tablecopy() { return table.copy(); }
+	public Table<F, G> tablecopy() { return table.copy(); }
 }

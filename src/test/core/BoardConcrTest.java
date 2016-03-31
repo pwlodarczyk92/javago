@@ -1,13 +1,14 @@
 package core;
 
-import core.board.Board;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Range;
 import core.board.IntBoard;
-import core.table.IntTable;
-import core.table.Table;
 import core.color.IntColor;
-import core.table.TableView;
+import core.table.IntTable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -16,6 +17,7 @@ import java.util.function.Function;
 public class BoardConcrTest extends BoardTest<IntBoard> {
 	@Override
 	protected IntBoard createInstance(Function<Integer, Collection<Integer>> adjacency, IntColor whites, IntColor blacks) {
-		return new IntBoard(new IntTable(adjacency, whites, blacks));
+		List<Integer> ran = ContiguousSet.create(Range.closed(-20, 20), DiscreteDomain.integers()).asList();
+		return new IntBoard(new IntTable(ran, adjacency, whites, blacks));
 	}
 }

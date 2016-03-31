@@ -1,10 +1,9 @@
 package core.table;
 
 import core.color.ColorView;
+import core.color.IColor;
 import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
-import utils.Copyable;
-import core.color.IColor;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,14 +14,14 @@ import java.util.function.Function;
  * Created by maxus on 23.02.16.
  */
 
-public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable<F, G, TableView<F, G>> {
+public class Table<F, G> implements ITable<F, G> {
 
 	protected Collection<F> fields;
 	protected Function<F, Collection<F>> adjacency;
-	protected C whites;
-	protected C blacks;
+	protected IColor<F, G> whites;
+	protected IColor<F, G> blacks;
 
-	public Table(Collection<F> fields, Function<F, Collection<F>> adjacency, C whites, C blacks) {
+	public Table(Collection<F> fields, Function<F, Collection<F>> adjacency, IColor<F, G> whites, IColor<F, G> blacks) {
 		this.fields = fields;
 		this.adjacency = adjacency;
 		this.whites = whites;
@@ -47,11 +46,6 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 	}
 
 	@Override
-	public TableView<F, G> getview() {
-		return this;
-	}
-
-	@Override
 	public ColorView<F, G> getview(Stone s) {
 		switch (s) {
 			case WHITE: return whites;
@@ -68,9 +62,13 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 	public Function<F, Collection<F>> getadjacency() {
 		return adjacency;
 	}
+	@Override
+	public TableView<F, G> getview() {
+		return this;
+	}
 	//--accessors--
 
-	private Set<F> getlibs_bygroup(C main, C substract, G group) {
+	private Set<F> getlibs_bygroup(IColor<F, G> main, IColor<F, G> substract, G group) {
 
 		HashSet<F> result = new HashSet<>();
 
@@ -83,7 +81,7 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 
 	}
 
-	private Set<F> getlibs(C main, C substract, F field) {
+	private Set<F> getlibs(IColor<F, G> main, IColor<F, G> substract, F field) {
 
 		return getlibs_bygroup(main, substract, main.getgroup(field));
 
@@ -94,8 +92,8 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 	public Set<F> put(Stone stone, F field) {
 
 		HashSet<F> removed_stones = new HashSet<>();
-		C player = stone == Stone.BLACK ? blacks : whites;
-		C enemy = stone == Stone.BLACK ? whites : blacks;
+		IColor<F, G> player = stone == Stone.BLACK ? blacks : whites;
+		IColor<F, G> enemy = stone == Stone.BLACK ? whites : blacks;
 
 		if (player.contains(field) || enemy.contains(field)) {
 			throw new MoveNotAllowed();
@@ -136,6 +134,12 @@ public class Table<F, G, C extends IColor<F, G> & Copyable<C>> implements ITable
 	}
 
 
+	@Override
+	public Table<F, G> copy() {
+		IColor<F, G> wc = whites.copy();
+		IColor<F, G> bc = blacks.copy();
+		return new Table<>(fields, adjacency, wc, bc);
+	}
 
 	@Override
 	public boolean equals(Object o) {

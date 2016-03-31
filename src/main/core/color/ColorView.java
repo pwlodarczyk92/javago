@@ -8,10 +8,12 @@ import java.util.Set;
 public interface ColorView<F, G> {
 
 	public G getgroup(F node);
-	public Set<F> getnodes(G group);
-	public Set<F> allstones();
 	public Set<G> getgroups();
+
+	public Set<F> getnodes(G group);
 	public Set<F> getlibs(G group);
+	public Set<F> allstones();
+
 	public default boolean contains(F node) {
 		return allstones().contains(node);
 	}

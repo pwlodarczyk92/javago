@@ -1,7 +1,6 @@
 package core;
 
 import com.google.common.collect.Collections2;
-import utils.Copyable;
 import core.color.IColor;
 import org.junit.Before;
 
@@ -11,7 +10,7 @@ import java.util.function.Function;
 /**
  * Created by maxus on 21.02.16.
  */
-public abstract class IntColorTest<G, C extends IColor<Integer, G> & Copyable<C>>{
+public abstract class IntColorTest<G>{
 
 	private static class LinAdj implements Function<Integer, Collection<Integer>> {
 		@Override
@@ -21,9 +20,9 @@ public abstract class IntColorTest<G, C extends IColor<Integer, G> & Copyable<C>
 	}
 
 	private Function<Integer, Collection<Integer>> adj = new LinAdj();
-	private C instance;
+	private IColor<Integer, G> instance;
 
-	protected abstract C createInstance(Function<Integer, Collection<Integer>> adjacency);
+	protected abstract IColor<Integer, G> createInstance(Function<Integer, Collection<Integer>> adjacency);
 
 	@Before
 	public final void setUp() {
@@ -48,7 +47,7 @@ public abstract class IntColorTest<G, C extends IColor<Integer, G> & Copyable<C>
 
 		for(List<Integer> perm: Collections2.permutations(group)) {
 
-			C inst = createInstance(adj);
+			IColor<Integer, G> inst = createInstance(adj);
 
 			for (Integer i: perm) {
 				inst.addstone(i);
@@ -74,7 +73,7 @@ public abstract class IntColorTest<G, C extends IColor<Integer, G> & Copyable<C>
 
 		for(List<Integer> perm: Collections2.permutations(groups)) {
 
-			C inst = createInstance(adj);
+			IColor<Integer, G> inst = createInstance(adj);
 			for (Integer i: perm) {
 				inst.addstone(i);
 			}
@@ -101,12 +100,12 @@ public abstract class IntColorTest<G, C extends IColor<Integer, G> & Copyable<C>
 
 		for(List<Integer> perm: Collections2.permutations(groups)) {
 
-			C inst = createInstance(adj);
+			IColor<Integer, G> inst = createInstance(adj);
 			for (Integer i: perm) {
 				inst.addstone(i);
 			}
 
-			C instc = inst.copy();
+			IColor<Integer, G> instc = inst.copy();
 
 			assert inst.allstones().equals(groups);
 			assert instc.allstones().equals(groups);

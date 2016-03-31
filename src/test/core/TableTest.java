@@ -1,11 +1,9 @@
 package core;
 
 import core.color.ColorView;
+import core.color.IntColor;
 import core.primitives.Stone;
 import core.table.Table;
-import utils.Copyable;
-import core.color.IColor;
-import core.color.IntColor;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +13,7 @@ import java.util.function.Function;
 /**
  * Created by maxus on 03.03.16.
  */
-public abstract class TableTest<G, C extends IColor<Integer,G> & Copyable<C>, T extends Table<Integer, G, C>> {
+public abstract class TableTest {
 
 	private static class LinAdj implements Function<Integer, Collection<Integer>> {
 		@Override
@@ -26,13 +24,13 @@ public abstract class TableTest<G, C extends IColor<Integer,G> & Copyable<C>, T 
 
 	private Function<Integer, Collection<Integer>> adj = new LinAdj();
 
-	protected abstract T createInstance(Function<Integer, Collection<Integer>> adjacency, IntColor whites, IntColor blacks);
+	protected abstract Table<Integer, ?> createInstance(Function<Integer, Collection<Integer>> adjacency, IntColor whites, IntColor blacks);
 
 	@org.junit.Test
 	public final void simpleTest() {
-		T table = createInstance(adj, new IntColor(adj), new IntColor(adj));
-		ColorView<Integer, G> w = table.getview(Stone.WHITE);
-		ColorView<Integer, G> b = table.getview(Stone.BLACK);
+		Table<Integer, ?> table = createInstance(adj, new IntColor(adj), new IntColor(adj));
+		ColorView<Integer, ?> w = table.getview(Stone.WHITE);
+		ColorView<Integer, ?> b = table.getview(Stone.BLACK);
 
 		table.put(Stone.WHITE, 1);
 		assert w.allstones().equals(mkset(1));

@@ -1,4 +1,5 @@
 package core.color;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -6,7 +7,7 @@ import java.util.function.Function;
  * Created by maxus on 20.02.16.
  */
 
-public abstract class Color<Field> implements IColor<Field, Field>{
+public class Color<Field> implements IColor<Field, Field>{
 
 	//--internal structure--
 	protected final HashMap<Field, Field> roots;
@@ -146,5 +147,40 @@ public abstract class Color<Field> implements IColor<Field, Field>{
 		return node;
 
 	}
+	// --interface--
+
+	// --identity, equality--
+	@Override
+	public Color<Field> copy() {
+		HashMap<Field, HashSet<Field>> nf = new HashMap<>();
+		HashMap<Field, HashSet<Field>> nl = new HashMap<>();
+		for (Map.Entry<Field, HashSet<Field>> f: families.entrySet()) {
+			nf.put(f.getKey(), new HashSet<>(f.getValue()));
+		}
+		for (Map.Entry<Field, HashSet<Field>> l: liberties.entrySet()) {
+			nl.put(l.getKey(), new HashSet<>(l.getValue()));
+		}
+		return new Color<Field>(adjacency,
+				new HashMap<>(roots),
+				nf,
+				nl) {
+		};
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Color intColor = (Color) o;
+
+		return intColor.roots.keySet().equals(roots.keySet());
+	}
+
+	@Override
+	public int hashCode() {
+		return roots.size() + (19*19*19*19) * families.size();
+	}
+	// --identity, equality--
 
 }
