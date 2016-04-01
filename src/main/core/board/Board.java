@@ -24,9 +24,9 @@ public class Board<F, G> {
 
 	public Board(Table<F, G> table) {
 		this.table = table;
-		this.history.add(table);
-		this.blackpoints.add(0);
-		this.whitepoints.add(0);
+		this.history.addLast(table);
+		this.blackpoints.addLast(0);
+		this.whitepoints.addLast(0);
 	}
 
 	public void put(F field) {
@@ -36,7 +36,7 @@ public class Board<F, G> {
 		}
 
 		if (field == null) {
-			moves.add(null);
+			moves.addLast(null);
 			currstone = currstone.opposite();
 			passcounter += 1;
 			return;
@@ -49,12 +49,12 @@ public class Board<F, G> {
 			throw new MoveNotAllowed(); //positional super-ko rule
 		}
 
-		moves.add(field);
+		moves.addLast(field);
 		snaps.add(newtable);
-		history.add(newtable);
+		history.addLast(newtable);
 		switch (currstone) {
-			case WHITE: whitepoints.add(whitepoints.peek()+points); break;
-			case BLACK: blackpoints.add(blackpoints.peek()+points); break;
+			case WHITE: whitepoints.addLast(whitepoints.peekLast()+points); break;
+			case BLACK: blackpoints.addLast(blackpoints.peekLast()+points); break;
 			default: throw new RuntimeException();
 		}
 		currstone = currstone.opposite();
