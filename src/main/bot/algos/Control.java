@@ -53,7 +53,7 @@ public class Control {
 
 		while(!frontresult.isEmpty()) {
 
-			if (round == rounds)
+			if (round >= rounds)
 				break;
 			round +=1;
 

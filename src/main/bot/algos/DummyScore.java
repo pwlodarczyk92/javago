@@ -49,10 +49,15 @@ public class DummyScore {
 
 	private static <F> Double score(Board<F, ?> board) {
 
-		HashMap<F, Double> control = Control.get(board.tableview());
+		Integer rounds = 3;
+		Double zonefactor = rounds <= 0 ? 1.0 : 1.0/(rounds*(rounds+1)*2);
+
+		HashMap<F, Double> control = Control.get(board.tableview(), rounds);
 		Double contrresult = 0.0;
 		for(Double i: control.values())
 			contrresult += i;
+		contrresult *= zonefactor;
+
 		Integer pointresult = board.points(Stone.WHITE) - board.points(Stone.BLACK);
 
 		return contrresult*covconst + pointresult;
