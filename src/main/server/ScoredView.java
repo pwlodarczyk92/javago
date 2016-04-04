@@ -21,7 +21,7 @@ public class ScoredView extends GameExtView {
 		gamescore = new GameScore<>(game, helpergame);
 	}
 
-	protected ScoredState getview(Score score) {
+	public final ScoredState getview(Score score) {
 		ScoredState state = new ScoredState();
 		parser.update(state, game.getview());
 		state.scores = new ArrayList<>();

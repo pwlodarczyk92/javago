@@ -117,6 +117,17 @@ public class Board<F, G> implements Game<F, G> {
 		this.history.addLast(this.currentstate);
 	}
 
+	private Map.Entry<Set<F>, BoardState<F, G>> getstate(BoardState<F, G> state, F field) {
+		Map.Entry<Set<F>, BoardState<F, G>> result = cache.get(state, field);
+		if (result == null) {
+			ITable<F, G> newtable = state.table.copy();
+			Set<F> points = newtable.put(currentstate.currentstone, field);
+			result = new AbstractMap.SimpleEntry<>(points, state.movestate(newtable, points));
+			//cache.put(state, field, result);
+		}
+		return result;
+	}
+
 	//--game state modifiers--
 	@Override
 	public Set<F> put(F field) {
@@ -134,8 +145,10 @@ public class Board<F, G> implements Game<F, G> {
 
 		} else {
 
-			ITable<F, G> newtable = currentstate.table.copy();
-			points = newtable.put(currentstate.currentstone, field);
+			Map.Entry<Set<F>, BoardState<F, G>> result = getstate(currentstate, field);
+			newstate = result.getValue();
+			ITable<F, G> newtable = newstate.gettable();
+			points = result.getKey();
 
 			if (snaps.contains(newtable))
 				throw new MoveNotAllowed(); //positional super-ko rule
