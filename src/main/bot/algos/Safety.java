@@ -43,16 +43,16 @@ public class Safety<F1, G1> {
 		Set<G> wgs = wview.getgroups();
 		Set<G> bgs = bview.getgroups();
 
-		for(G group: wgs) {
-			F field = wview.getanynode(group);
-			int score = get(new Safety<>(board, Stone.WHITE, field, max, maxcountover), group, count);
-			for(F f: wview.getnodes(group))
-				result.put(f, score);
-		}
 		for(G group: bgs) {
 			F field = bview.getanynode(group);
 			int score = get(new Safety<>(board, Stone.BLACK, field, max, maxcountover), group, count);
 			for(F f: bview.getnodes(group))
+				result.put(f, score);
+		}
+		for(G group: wgs) {
+			F field = wview.getanynode(group);
+			int score = get(new Safety<>(board, Stone.WHITE, field, max, maxcountover), group, count);
+			for(F f: wview.getnodes(group))
 				result.put(f, score);
 		}
 
@@ -88,7 +88,7 @@ public class Safety<F1, G1> {
 			cum += depths.get(i);
 			logger.info("count: {} : {}", i, cum/(double)sum);
 		}
-		logger.info("COUNT SUM: {}", sum);
+		logger.info("count sum: {}", sum);
 		logger.info("");
 		depths.clear();
 		return result;

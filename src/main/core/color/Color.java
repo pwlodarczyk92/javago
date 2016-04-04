@@ -175,7 +175,7 @@ public class Color<Field> implements IColor<Field, Field>{
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (!(o instanceof Color)) return false;
 
 		Color intColor = (Color) o;
 

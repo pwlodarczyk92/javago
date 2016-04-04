@@ -46,7 +46,6 @@ public class GameManager<F, G> {
 			}
 			samemovenum+=1;
 		}
-		logger.warn("ok num: {}", samemovenum);
 
 		int delnum = internalmoves.size() - samemovenum;
 		for (int i = delnum; i>0; i--)
@@ -61,9 +60,7 @@ public class GameManager<F, G> {
 	}
 
 	private boolean aligned() {
-		boolean result = internalboard.moves().equals(board.moves());
-		logger.warn("aligned? :", Boolean.toString(result));
-		return result;
+		return internalboard.moves().equals(board.moves());
 	}
 
 	public Game<F, ?> board() {

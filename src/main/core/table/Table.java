@@ -62,10 +62,7 @@ public class Table<F, G> implements ITable<F, G> {
 	public Function<F, Collection<F>> getadjacency() {
 		return adjacency;
 	}
-	@Override
-	public TableView<F, G> getview() {
-		return this;
-	}
+
 	//--accessors--
 
 	private Set<F> getlibs_bygroup(IColor<F, G> main, IColor<F, G> substract, G group) {
@@ -143,7 +140,7 @@ public class Table<F, G> implements ITable<F, G> {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (!(o instanceof Table)) return false;
 
 		Table table = (Table) o;
 
@@ -157,7 +154,4 @@ public class Table<F, G> implements ITable<F, G> {
 	public int hashCode() {
 		return 19 * whites.hashCode() + blacks.hashCode();
 	}
-
-
-
 }

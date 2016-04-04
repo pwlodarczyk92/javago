@@ -17,6 +17,7 @@ public class Board<F, G> implements Game<F, G> {
 
 	protected static class BoardState<F, G> implements StateView<F, G> {
 
+		private int hash;
 		private ITable<F, G> table;
 		private Stone currentstone;
 		private Integer whitepoints;
@@ -37,6 +38,7 @@ public class Board<F, G> implements Game<F, G> {
 			this.blackpoints = blackpoints;
 			this.passcounter = passcounter;
 			this.currentstone = currentstone;
+			this.hash = hash();
 		}
 
 		public BoardState<F,G> nullstate() {
@@ -83,8 +85,8 @@ public class Board<F, G> implements Game<F, G> {
 
 			BoardState that = (BoardState) o;
 
-			if (!table.equals(that.table)) return false;
 			if (currentstone != that.currentstone) return false;
+			if (!table.equals(that.table)) return false;
 			if (!blackpoints.equals(that.blackpoints)) return false;
 			if (!passcounter.equals(that.passcounter)) return false;
 			if (!whitepoints.equals(that.whitepoints)) return false;
@@ -94,6 +96,10 @@ public class Board<F, G> implements Game<F, G> {
 
 		@Override
 		public int hashCode() {
+			return hash;
+		}
+
+		private int hash() {
 			int result = table.hashCode();
 			result = 31 * result + currentstone.hashCode();
 			result = 31 * result + whitepoints.hashCode();
@@ -110,22 +116,11 @@ public class Board<F, G> implements Game<F, G> {
 	private LinkedList<BoardState<F, G>> history = new LinkedList<>();
 	private LinkedList<F> moves = new LinkedList<>();
 	private HashSet<ITable<F, G>> snaps = new HashSet<>();
-	private Table<BoardState<F, G>, F, Map.Entry<Set<F>, BoardState<F, G>>> cache = HashBasedTable.create();
+	private Table<BoardState<F, G>, F, Map.Entry<Set<F>, BoardState<F, G>>> statecache = HashBasedTable.create();
 
 	public Board(ITable<F, G> table) {
 		this.currentstate = new BoardState<>(table);
 		this.history.addLast(this.currentstate);
-	}
-
-	private Map.Entry<Set<F>, BoardState<F, G>> getstate(BoardState<F, G> state, F field) {
-		Map.Entry<Set<F>, BoardState<F, G>> result = cache.get(state, field);
-		if (result == null) {
-			ITable<F, G> newtable = state.table.copy();
-			Set<F> points = newtable.put(currentstate.currentstone, field);
-			result = new AbstractMap.SimpleEntry<>(points, state.movestate(newtable, points));
-			//cache.put(state, field, result);
-		}
-		return result;
 	}
 
 	//--game state modifiers--
@@ -145,16 +140,24 @@ public class Board<F, G> implements Game<F, G> {
 
 		} else {
 
-			Map.Entry<Set<F>, BoardState<F, G>> result = getstate(currentstate, field);
-			newstate = result.getValue();
-			ITable<F, G> newtable = newstate.gettable();
-			points = result.getKey();
+			Map.Entry<Set<F>, BoardState<F, G>> cachedata = statecache.get(currentstate, field);
 
-			if (snaps.contains(newtable))
-				throw new MoveNotAllowed(); //positional super-ko rule
-			snaps.add(newtable);
+			if (cachedata == null) {
 
-			newstate = currentstate.movestate(newtable, points);
+				ITable<F, G> newtable = currentstate.table.copy();
+				if (snaps.contains(newtable))
+					throw new MoveNotAllowed(); //positional super-ko rule
+				snaps.add(newtable);
+
+				points = newtable.put(currentstate.currentstone, field);
+				newstate = currentstate.movestate(newtable, points);
+				cachedata = new AbstractMap.SimpleEntry<>(points, newstate);
+				statecache.put(currentstate, field, cachedata);
+
+			} else {
+				points = cachedata.getKey();
+				newstate = cachedata.getValue();
+			}
 
 		}
 
