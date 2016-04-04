@@ -1,4 +1,4 @@
-package bot.algos;
+package bot.trash;
 
 import core.board.Board;
 import core.primitives.MoveNotAllowed;

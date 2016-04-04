@@ -1,4 +1,4 @@
-package bot.algos;
+package bot.trash;
 
 import core.color.ColorView;
 import core.primitives.Stone;
@@ -43,9 +43,9 @@ public class Control {
 		ColorView<F, ?> wview = view.getview(Stone.WHITE);
 		ColorView<F, ?> bview = view.getview(Stone.BLACK);
 
-		for (F field: wview.allstones())
+		for (F field: wview.getallnodes())
 			result.put(field, +1.0);
-		for (F field: bview.allstones())
+		for (F field: bview.getallnodes())
 			result.put(field, -1.0);
 
 		Integer round = 0;

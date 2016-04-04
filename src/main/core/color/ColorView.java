@@ -11,11 +11,15 @@ public interface ColorView<F, G> {
 	public Set<G> getgroups();
 
 	public Set<F> getnodes(G group);
-	public Set<F> getlibs(G group);
-	public Set<F> allstones();
+	public Set<F> getadjacent(G group);
+
+	public Set<F> getallnodes();
+	public default F getanynode(G group) {
+		return getnodes(group).iterator().next();
+	}
 
 	public default boolean contains(F node) {
-		return allstones().contains(node);
+		return getallnodes().contains(node);
 	}
 
 }

@@ -9,9 +9,9 @@ import spark.Response;
 /**
  * Created by maxus on 31.03.16.
  */
-public class GoBotApi extends GoAPI<BottedBoard>  {
+public class GoBotAPI extends GoAPI<BottedBoard>  {
 
-	public GoBotApi() {
+	public GoBotAPI() {
 		super();
 		actions.put("botmove", this::dobotmove);
 	}

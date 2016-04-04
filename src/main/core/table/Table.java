@@ -72,7 +72,7 @@ public class Table<F, G> implements ITable<F, G> {
 
 		HashSet<F> result = new HashSet<>();
 
-		for (F lib: main.getlibs(group)) {
+		for (F lib: main.getadjacent(group)) {
 			if (!substract.contains(lib))
 				result.add(lib);
 		}
@@ -95,9 +95,8 @@ public class Table<F, G> implements ITable<F, G> {
 		IColor<F, G> player = stone == Stone.BLACK ? blacks : whites;
 		IColor<F, G> enemy = stone == Stone.BLACK ? whites : blacks;
 
-		if (player.contains(field) || enemy.contains(field)) {
+		if (player.contains(field) || enemy.contains(field))
 			throw new MoveNotAllowed();
-		}
 
 		Collection<F> adjacent = adjacency.apply(field);
 		boolean moveok = false;
@@ -121,7 +120,7 @@ public class Table<F, G> implements ITable<F, G> {
 					moveok = true;
 					break;
 					//TODO: add tests for correctness of this check
-					//TODO: older check threw exception if getlibs().size()==1, which is wrong
+					//TODO: older check threw exception if getadjacent().size()==1, which is wrong
 				}
 			}
 		}
@@ -156,7 +155,7 @@ public class Table<F, G> implements ITable<F, G> {
 
 	@Override
 	public int hashCode() {
-		return (19*19) * whites.hashCode() + blacks.hashCode();
+		return 19 * whites.hashCode() + blacks.hashCode();
 	}
 
 

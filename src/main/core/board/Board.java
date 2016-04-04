@@ -1,116 +1,181 @@
 package core.board;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
-import core.table.Table;
-import core.table.TableView;
+import core.table.ITable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 /**
  * Created by maxus on 24.02.16.
  */
-public class Board<F, G> {
+public class Board<F, G> implements Game<F, G> {
 
-	private LinkedList<F> moves = new LinkedList<>();
-	private HashSet<Table<F, G>> snaps = new HashSet<>();
-	private Deque<Table<F, G>> history = new ArrayDeque<>();
-	private Deque<Integer> blackpoints = new ArrayDeque<>();
-	private Deque<Integer> whitepoints = new ArrayDeque<>();
+	protected static class BoardState<F, G> implements StateView<F, G> {
 
-	private Table<F, G> table;
-	protected Stone currstone = Stone.WHITE;
-	protected Integer passcounter = 0;
+		private ITable<F, G> table;
+		private Stone currentstone;
+		private Integer whitepoints;
+		private Integer blackpoints;
+		private Integer passcounter;
 
-	public Board(Table<F, G> table) {
-		this.table = table;
-		this.history.addLast(table);
-		this.blackpoints.addLast(0);
-		this.whitepoints.addLast(0);
-	}
-
-	public void put(F field) {
-
-		if (passcounter > 2) {
-			throw new MoveNotAllowed();
+		public BoardState(ITable<F, G> table) {
+			this.table = table;
+			this.currentstone = Stone.WHITE;
+			this.whitepoints = 0;
+			this.blackpoints = 0;
+			this.passcounter = 0;
 		}
 
-		if (field == null) {
-			moves.addLast(null);
-			currstone = currstone.opposite();
-			passcounter += 1;
-			return;
+		public BoardState(ITable<F, G> table, Integer whitepoints, Integer blackpoints, Integer passcounter, Stone currentstone) {
+			this.table = table;
+			this.whitepoints = whitepoints;
+			this.blackpoints = blackpoints;
+			this.passcounter = passcounter;
+			this.currentstone = currentstone;
 		}
 
-		Table<F, G> newtable = this.table.copy();
-
-		int points = newtable.put(currstone, field).size();
-		if (snaps.contains(newtable)) {
-			throw new MoveNotAllowed(); //positional super-ko rule
+		public BoardState<F,G> nullstate() {
+			return new BoardState<>(table, whitepoints, blackpoints, passcounter+1, currentstone.opposite());
 		}
 
-		moves.addLast(field);
-		snaps.add(newtable);
-		history.addLast(newtable);
-		switch (currstone) {
-			case WHITE: whitepoints.addLast(whitepoints.peekLast()+points); break;
-			case BLACK: blackpoints.addLast(blackpoints.peekLast()+points); break;
-			default: throw new RuntimeException();
-		}
-		currstone = currstone.opposite();
-		passcounter = 0;
-		this.table = newtable;
-
-	}
-
-	public F undo() {
-
-		F lastmove = moves.removeLast();
-		currstone = currstone.opposite();
-
-		if (lastmove != null) {
-			Table<F, G> lasttable = history.removeLast();
-			snaps.remove(lasttable);
-			table = history.peekLast();
-			switch (currstone) {
-				case WHITE: whitepoints.removeLast(); break;
-				case BLACK: blackpoints.removeLast(); break;
+		public BoardState<F,G> movestate(ITable<F, G> newtable, Set<F> points) {
+			switch (currentstone) {
+				case WHITE: return new BoardState<>(newtable, whitepoints+points.size(), blackpoints, 0, currentstone.opposite());
+				case BLACK: return new BoardState<>(newtable, whitepoints, blackpoints+points.size(), 0, currentstone.opposite());
 				default: throw new RuntimeException();
 			}
 		}
 
-		passcounter = 0;
-		Iterator<F> passes = moves.descendingIterator();
-		while (passes.hasNext()) {
-			F move = passes.next();
-			if (move != null) break;
-			passcounter += 1;
+		@Override
+		public Integer getpasscount() {
+			return passcounter;
 		}
+
+		@Override
+		public Integer getwhitepoints() {
+			return whitepoints;
+		}
+
+		@Override
+		public Integer getblackpoints() {
+			return blackpoints;
+		}
+
+		@Override
+		public Stone getcurrentstone() {
+			return currentstone;
+		}
+
+		@Override
+		public ITable<F, G> gettable() {
+			return table;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			BoardState that = (BoardState) o;
+
+			if (!table.equals(that.table)) return false;
+			if (currentstone != that.currentstone) return false;
+			if (!blackpoints.equals(that.blackpoints)) return false;
+			if (!passcounter.equals(that.passcounter)) return false;
+			if (!whitepoints.equals(that.whitepoints)) return false;
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = table.hashCode();
+			result = 31 * result + currentstone.hashCode();
+			result = 31 * result + whitepoints.hashCode();
+			result = 31 * result + blackpoints.hashCode();
+			result = 31 * result + passcounter.hashCode();
+			return result;
+		}
+
+	}
+
+	final protected Logger logger = LoggerFactory.getLogger(Board.class.getName());
+
+	protected BoardState<F, G> currentstate;
+	private LinkedList<BoardState<F, G>> history = new LinkedList<>();
+	private LinkedList<F> moves = new LinkedList<>();
+	private HashSet<ITable<F, G>> snaps = new HashSet<>();
+	private Table<BoardState<F, G>, F, Map.Entry<Set<F>, BoardState<F, G>>> cache = HashBasedTable.create();
+
+	public Board(ITable<F, G> table) {
+		this.currentstate = new BoardState<>(table);
+		this.history.addLast(this.currentstate);
+	}
+
+	//--game state modifiers--
+	@Override
+	public Set<F> put(F field) {
+
+		if (currentstate.passcounter > 2)
+			throw new MoveNotAllowed();
+
+		BoardState<F, G> newstate;
+		Set<F> points;
+
+		if (field == null) {
+
+			points = null;
+			newstate = currentstate.nullstate();
+
+		} else {
+
+			ITable<F, G> newtable = currentstate.table.copy();
+			points = newtable.put(currentstate.currentstone, field);
+
+			if (snaps.contains(newtable))
+				throw new MoveNotAllowed(); //positional super-ko rule
+			snaps.add(newtable);
+
+			newstate = currentstate.movestate(newtable, points);
+
+		}
+
+		this.moves.addLast(field);
+		this.history.addLast(newstate);
+		this.currentstate = newstate;
+		return points;
+
+	}
+	@Override
+	public F undo() {
+
+		if (moves.isEmpty()) throw new RuntimeException();
+
+		F lastmove = moves.removeLast();
+		BoardState<F, G> laststate = history.removeLast();
+		this.currentstate = history.peekLast();
+
+		if (lastmove != null)
+			snaps.remove(laststate.table);
 
 		return lastmove;
 
 	}
+	//--game state modifiers--
 
-	public int points(Stone stone) {
-		switch (stone) {
-			case WHITE: return whitepoints.peekLast();
-			case BLACK: return blackpoints.peekLast();
-			default: throw new RuntimeException();
-		}
-	}
-
-	public Stone currentstone() {
-		return currstone;
-	}
-	public Integer passcount() {
-		return passcounter;
-	}
+	//--accessors--
+	@Override
 	public List<F> moves() {
 		return Collections.unmodifiableList(moves);
 	}
-
-	public TableView<F, G> tableview() {
-		return table.getview();
+	@Override
+	public StateView<F, G> getview() {
+		return currentstate;
 	}
-	public Table<F, G> tablecopy() { return table.copy(); }
+	//--accessors--
 }

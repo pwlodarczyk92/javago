@@ -42,7 +42,7 @@ public class Color<Field> implements IColor<Field, Field>{
 		return roots.get(node);
 	}
 	@Override
-	public Set<Field> getlibs(Field root) {
+	public Set<Field> getadjacent(Field root) {
 		return liberties.get(root);
 	}
 	@Override
@@ -50,8 +50,12 @@ public class Color<Field> implements IColor<Field, Field>{
 		return families.get(root);
 	}
 	@Override
-	public Set<Field> allstones() {
+	public Set<Field> getallnodes() {
 		return roots.keySet();
+	}
+	@Override
+	public Field getanynode(Field group) {
+		return group;
 	}
 	@Override
 	public Set<Field> getgroups() {
@@ -84,7 +88,7 @@ public class Color<Field> implements IColor<Field, Field>{
 
 		// for every group adjacent to a new stone
 		// find biggest one and its root
-		// save all these roots to checkedroots
+		// save all traversed roots to <checkedroots>
 
 		for (Field adjacent: adjacency.apply(node)) {
 			if (!this.contains(adjacent))
@@ -121,10 +125,10 @@ public class Color<Field> implements IColor<Field, Field>{
 		HashSet<Field> maxfamily = families.get(maxroot);
 		HashSet<Field> maxliberties = liberties.get(maxroot);
 
-		for (Field adjroot: checkedroots) {
+		for (Field subroot: checkedroots) {
 
-			maxliberties.addAll(liberties.remove(adjroot));
-			HashSet<Field> nowfam = families.remove(adjroot);
+			maxliberties.addAll(liberties.remove(subroot));
+			HashSet<Field> nowfam = families.remove(subroot);
 			maxfamily.addAll(nowfam);
 
 			for (Field n: nowfam)
@@ -132,9 +136,10 @@ public class Color<Field> implements IColor<Field, Field>{
 
 		}
 
-		// include new node in merged groups
+		// include new node in a new group
 		// include adjacent empty nodes in liberties
 		// exclude new node from liberties
+		// set root for a new stone
 
 		for (Field adjacent: adjacency.apply(node)) {
 			if (!this.contains(adjacent))
@@ -179,7 +184,7 @@ public class Color<Field> implements IColor<Field, Field>{
 
 	@Override
 	public int hashCode() {
-		return roots.size() + (19*19*19*19) * families.size();
+		return roots.size() + 31 * families.size();
 	}
 	// --identity, equality--
 
