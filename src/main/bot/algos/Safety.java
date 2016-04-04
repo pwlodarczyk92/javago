@@ -60,6 +60,8 @@ public class Safety<F1, G1> {
 
 	}
 
+	// iteration has 3 endpoints - immortality, death and liberties count exceeding maximum
+	// and 1 exception - atari, with check limit - maxcountoverflow
 	private static <F, G> int get(Safety<F, G> safety, G group, int count) {
 
 		TableView<F, G> table = safety.board.getview().gettable();
@@ -76,9 +78,6 @@ public class Safety<F1, G1> {
 		else
 			result = killmove(safety, group, libs, count);
 
-		//logger.info("Group size  : {}", board.stateview().getview(stone).getnodes(group).size());
-		//logger.info("Group libs  : {}", board.stateview().getview(stone).getadjacent(group).size());
-		//logger.info("Group result: {}", result);
 		Integer sum = 0;
 		Integer cum = 0;
 		ArrayList<Integer> cts = new ArrayList<>(depths.keySet());
@@ -86,9 +85,9 @@ public class Safety<F1, G1> {
 		for (Integer i: cts) sum += depths.get(i);
 		for (Integer i: cts) {
 			cum += depths.get(i);
-			logger.info("count: {} : {}", i, cum/(double)sum);
+			logger.info("depth count: {} : {}", i, cum/(double)sum);
 		}
-		logger.info("count sum: {}", sum);
+		logger.info("iterations: {}", sum);
 		logger.info("");
 		depths.clear();
 		return result;
@@ -105,7 +104,7 @@ public class Safety<F1, G1> {
 		Integer libsize = libs.size();
 		boolean overflow = count<0;
 
-		if (libsize>1) { //check for endpoint
+		if (libsize>1) { //check for endpoint 1
 			TableView<F, G> view = safety.board.getview().gettable();
 			ColorView<F, G> cview = view.getview(safety.stone);
 			if (Immortal.immortals(view.getadjacency(), cview).groups.contains(group)) {
@@ -113,15 +112,14 @@ public class Safety<F1, G1> {
 			}
 		}
 
-		if ((overflow && libsize>2) || libsize > safety.max) // terminate unproductive recursion, but watch for atari
+		if (libsize > safety.max) //check for endpoint 3
 			return libsize;
 
-		if (count < - safety.maxoverflow) {
-			//logger.warn("wide atari?");
+		if (overflow && libsize>2) // check for exception
 			return libsize;
-		}
 
-		//logger.info("kill phase begin : {} {}", Strings.repeat("-", Math.max(1, elevation+count)), libs.size());
+		if (count < - safety.maxoverflow) // check for exception limit
+			return libsize;
 
 		for(F lib: libs) {
 
@@ -131,9 +129,8 @@ public class Safety<F1, G1> {
 				Set<F> killed = safety.board.put(lib);
 				TableView<F, G> view = safety.board.getview().gettable();
 
-				if (killed.contains(safety.field)) { // check for endpoint
+				if (killed.contains(safety.field)) { // check for endpoint 2
 					safety.board.undo();
-					//logger.info("kill phase result: {} {}", Strings.repeat("-", Math.max(1, elevation+count)), 0);
 					return 0;
 				}
 
@@ -145,7 +142,7 @@ public class Safety<F1, G1> {
 
 			if(leastlibs == null || result < leastlibs)
 				leastlibs = result;
-			if (leastlibs == 0)
+			if (leastlibs == 0) // check for endpoint 2
 				return 0;
 
 		}
@@ -159,7 +156,6 @@ public class Safety<F1, G1> {
 			} catch (MoveNotAllowed e) {return libsize;} // is not immortal, but can do nothing with it right now
 		}
 
-		//logger.info("kill phase result: {} {}", Strings.repeat("-", Math.max(1, elevation+count)), leastlibs);
 		return leastlibs;
 
 	}
@@ -174,15 +170,13 @@ public class Safety<F1, G1> {
 		Integer libsize = libs.size();
 		boolean overflow = count<0;
 
-		if (overflow && libsize>1) // terminate unproductive recursion, but watch for atari
+		if (overflow && libsize>1) // check for exception
 			return libs.size();
 
-		if (count < -safety.maxoverflow) {
-			//logger.warn("wide atari?");
+		if (count < -safety.maxoverflow) // check for exception limit
 			return libs.size();
-		}
 
-		Set<F> worthwhile_fields = new HashSet<>();
+		Set<F> worthwhile_fields = new HashSet<>(libs);
 
 		TableView<F, G> tableview = safety.board.getview().gettable();
 		ColorView<F, G> enemyview = tableview.getview(safety.stone.opposite());
@@ -202,11 +196,6 @@ public class Safety<F1, G1> {
 
 		}
 
-		//logger.info("save phase begin : {} {}", Strings.repeat("-", Math.max(1, elevation+count)), libs.size());
-		//logger.info("save phase extra : {} {}", Strings.repeat("-", Math.max(1, elevation + count)), worthwhile_fields.size());
-		worthwhile_fields.addAll(libs);
-		//logger.info("save phase size  : {} {}", Strings.repeat("-", Math.max(1, elevation+count)), worthwhile_fields.size());
-
 		for(F wfield: worthwhile_fields) {
 
 			int result;
@@ -225,7 +214,7 @@ public class Safety<F1, G1> {
 
 			if(mostlib == null || result > mostlib)
 				mostlib = result;
-			if(mostlib > safety.max) {
+			if(mostlib > safety.max) { // checkpoint 1 and 3
 				return mostlib;
 			}
 
@@ -240,7 +229,6 @@ public class Safety<F1, G1> {
 			} catch (MoveNotAllowed e) { return libsize; } // cannot do anything and is not immortal - what should be returned?
 		}
 
-		//logger.info("save phase result: {} {}", Strings.repeat("-", Math.max(1, elevation+count)), mostlib);
 		return mostlib;
 
 	}
