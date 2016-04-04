@@ -3,9 +3,10 @@ package bot.helpers;
 import core.board.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by maxus on 30.03.16.
@@ -32,19 +33,20 @@ public class GameManager<F, G> {
 
 		Iterator<F> iiter = internalmoves.iterator();
 		Iterator<F> biter = boardmoves.iterator();
-
 		int samemovenum = 0;
 		F different = null;
 
 		while (iiter.hasNext() && biter.hasNext()) {
 			F imove = iiter.next();
 			F bmove = biter.next();
-			if (Objects.equals(imove, bmove)) {
+
+			if (!Objects.equals(imove, bmove)) {
 				different = bmove;
 				break;
 			}
 			samemovenum+=1;
 		}
+		logger.warn("ok num: {}", samemovenum);
 
 		int delnum = internalmoves.size() - samemovenum;
 		for (int i = delnum; i>0; i--)
@@ -59,42 +61,14 @@ public class GameManager<F, G> {
 	}
 
 	private boolean aligned() {
-		return internalboard.moves().equals(board.moves());
+		boolean result = internalboard.moves().equals(board.moves());
+		logger.warn("aligned? :", Boolean.toString(result));
+		return result;
 	}
 
 	public Game<F, ?> board() {
 		alignBoard();
 		return internalboard;
 	}
-
-
-	public void makemove() {
-		throw new NotImplementedException();
-	/* --- unfinished ---
-		Stone stone = board().getview().getcurrentstone();
-		Double factor = (stone == Stone.WHITE ? 1.0 : -1.0);
-
-		ArrayList<F> bestmoves = new ArrayList<>();
-		Double bestpoints = Double.MIN_VALUE;
-		HashMap<F, Double> scores = DummyScore.get(board());
-		assert aligned();
-
-		for(F field: scores.keySet()) {
-			Double score = factor * scores.get(field);
-			if (bestpoints<score) {
-				bestmoves.clear();
-				bestpoints = score;
-			}
-			if (bestpoints.equals(score))
-				bestmoves.add(field);
-		}
-
-		if (bestmoves.isEmpty()) {
-			throw new MoveNotAllowed();
-		}
-		board.put(bestmoves.get(0));
-	   --- unfinished --- */
-	}
-
 
 }
