@@ -33,28 +33,28 @@ public abstract class TableTest {
 		ColorView<Integer, ?> b = table.getview(Stone.BLACK);
 
 		table.put(Stone.WHITE, 1);
-		assert w.allstones().equals(mkset(1));
-		assert b.allstones().equals(mkset());
+		assert w.getallnodes().equals(mkset(1));
+		assert b.getallnodes().equals(mkset());
 
 		table.put(Stone.WHITE, 2);
-		assert w.allstones().equals(mkset(1, 2));
-		assert b.allstones().equals(mkset());
+		assert w.getallnodes().equals(mkset(1, 2));
+		assert b.getallnodes().equals(mkset());
 
 		table.put(Stone.BLACK, 0);
-		assert w.allstones().equals(mkset(1, 2));
-		assert b.allstones().equals(mkset(0));
+		assert w.getallnodes().equals(mkset(1, 2));
+		assert b.getallnodes().equals(mkset(0));
 
 		table.put(Stone.BLACK, 3);
-		assert w.allstones().equals(mkset());
-		assert b.allstones().equals(mkset(0, 3));
+		assert w.getallnodes().equals(mkset());
+		assert b.getallnodes().equals(mkset(0, 3));
 
 		table.put(Stone.WHITE, 2);
-		assert w.allstones().equals(mkset(2));
-		assert b.allstones().equals(mkset(0, 3));
+		assert w.getallnodes().equals(mkset(2));
+		assert b.getallnodes().equals(mkset(0, 3));
 
 		table.put(Stone.WHITE, 4);
-		assert w.allstones().equals(mkset(2, 4));
-		assert b.allstones().equals(mkset(0));
+		assert w.getallnodes().equals(mkset(2, 4));
+		assert b.getallnodes().equals(mkset(0));
 	}
 
 	@SafeVarargs

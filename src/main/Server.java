@@ -1,6 +1,5 @@
 import server.GoAPI;
-import server.GoBotApi;
-import server.GoMainAPI;
+import server.GoBotAPI;
 
 import static spark.Spark.*;
 
@@ -27,7 +26,7 @@ public class Server {
 		public String path = "/game";
 	}
 
-	private GoAPI api = new GoBotApi();
+	private GoAPI api = new GoBotAPI();
 	private Config config = new Config();
 	private boolean running = false;
 

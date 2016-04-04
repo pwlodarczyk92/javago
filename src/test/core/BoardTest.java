@@ -13,16 +13,16 @@ import java.util.function.Function;
  */
 public abstract class BoardTest<B extends Board<Integer, ?>> {
 
-	private static class LinAdj implements Function<java.lang.Integer, Collection<java.lang.Integer>> {
+	private static class LinAdj implements Function<Integer, Collection<Integer>> {
 		@Override
-		public Collection<java.lang.Integer> apply(java.lang.Integer integer) {
+		public Collection<Integer> apply(Integer integer) {
 			return Arrays.asList(integer - 1, integer + 1);
 		}
 	}
 
-	private Function<java.lang.Integer, Collection<java.lang.Integer>> adj = new LinAdj();
+	private Function<Integer, Collection<Integer>> adj = new LinAdj();
 
-	protected abstract B createInstance(Function<java.lang.Integer, Collection<java.lang.Integer>> adjacency, IntColor whites, IntColor blacks);
+	protected abstract B createInstance(Function<Integer, Collection<Integer>> adjacency, IntColor whites, IntColor blacks);
 
 	@org.junit.Test
 	public final void simpleTest() {
@@ -58,7 +58,7 @@ public abstract class BoardTest<B extends Board<Integer, ?>> {
 		board.undo(); //BBB WB
 		board.undo(); //BBB  B
 		board.undo(); //BBWWW
-		assert board.tableview().equals(oldboard.tableview());
+		assert board.getview().equals(oldboard.getview());
 	}
 
 }

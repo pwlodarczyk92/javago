@@ -1,30 +1,39 @@
 package server;
 
-import java.util.List;
+import bot.GameScore;
+import bot.Score;
+import core.board.Game;
+import core.views.Parser;
+import core.views.ScoredState;
+
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by maxus on 31.03.16.
  */
-public interface ScoredView<F, S extends Enum<S>> extends GameExtView<F> {
+public class ScoredView extends GameExtView {
 
-	public static class ScoreState extends State {
-		public List<List<Double>> scores;
+	private final GameScore gamescore;
+
+	public <F, G> ScoredView(Game<F, G> game, Game<F, G> helpergame, Parser<F> parser) {
+		super(game, parser);
+		gamescore = new GameScore<>(game, helpergame);
 	}
 
-	public Map<F, Double> getscores(S score);
-	public void dobotmove();
-
-	public default ScoreState state(S score) {
-
-		ScoreState result = new ScoreState();
-		Map<F, Double> scores = getscores(score);
-		updateState(result);
-		result.scores = getfields().stream().map(
-				column -> column.stream().map(scores::get).collect(Collectors.toList())
-		).collect(Collectors.toList());
-		return result;
-
+	protected ScoredState getview(Score score) {
+		ScoredState state = new ScoredState();
+		parser.update(state, game.getview());
+		state.scores = new ArrayList<>();
+		Map<?, Double> scorevalues = gamescore.getscores(score);
+		for(int i=0; i<nteen; i++) {
+			ArrayList<Double> column = new ArrayList<>();
+			for(int j=0; j< nteen; j++) {
+				column.add(scorevalues.get(parser.fields.apply(i, j)));
+			}
+			state.scores.add(column);
+		}
+		return state;
 	}
+
 }

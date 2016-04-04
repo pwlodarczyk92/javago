@@ -35,9 +35,9 @@ public abstract class IntColorTest<G>{
 		instance.addstone(3);
 		G group = instance.getgroup(3);
 
-		assert instance.allstones().equals(mkset(3));
+		assert instance.getallnodes().equals(mkset(3));
 		assert instance.getnodes(group).equals(mkset(3));
-		assert instance.getlibs(group).equals(mkset(2, 4));
+		assert instance.getadjacent(group).equals(mkset(2, 4));
 	}
 
 	@org.junit.Test
@@ -53,7 +53,7 @@ public abstract class IntColorTest<G>{
 				inst.addstone(i);
 			}
 
-			assert inst.allstones().equals(group);
+			assert inst.getallnodes().equals(group);
 
 			G root1 = inst.getgroup(perm.get(0));
 			for (Integer i: perm) {
@@ -61,7 +61,7 @@ public abstract class IntColorTest<G>{
 			}
 
 			inst.remgroup(root1);
-			assert inst.allstones().isEmpty();
+			assert inst.getallnodes().isEmpty();
 
 		}
 	}
@@ -78,7 +78,7 @@ public abstract class IntColorTest<G>{
 				inst.addstone(i);
 			}
 
-			assert inst.allstones().equals(groups);
+			assert inst.getallnodes().equals(groups);
 
 			assert Objects.equals(inst.getgroup(3), inst.getgroup(4));
 			assert Objects.equals(inst.getgroup(6), inst.getgroup(7));
@@ -88,7 +88,7 @@ public abstract class IntColorTest<G>{
 			assert !Objects.equals(inst.getgroup(6), inst.getgroup(3));
 
 			inst.remgroup(inst.getgroup(3));
-			assert inst.allstones().equals(mkset(6, 7));
+			assert inst.getallnodes().equals(mkset(6, 7));
 
 		}
 	}
@@ -107,8 +107,8 @@ public abstract class IntColorTest<G>{
 
 			IColor<Integer, G> instc = inst.copy();
 
-			assert inst.allstones().equals(groups);
-			assert instc.allstones().equals(groups);
+			assert inst.getallnodes().equals(groups);
+			assert instc.getallnodes().equals(groups);
 
 			assert Objects.equals(inst.getgroup(3), inst.getgroup(4));
 			assert Objects.equals(inst.getgroup(6), inst.getgroup(7));
@@ -125,8 +125,8 @@ public abstract class IntColorTest<G>{
 			assert !Objects.equals(instc.getgroup(6), instc.getgroup(3));
 
 			inst.remgroup(inst.getgroup(3));
-			assert inst.allstones().equals(mkset(6, 7));
-			assert instc.allstones().equals(groups);
+			assert inst.getallnodes().equals(mkset(6, 7));
+			assert instc.getallnodes().equals(groups);
 
 		}
 	}

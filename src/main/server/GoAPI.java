@@ -37,7 +37,6 @@ public abstract class GoAPI<G extends GameExtView> {
 	protected String pass(Request req, Response res, G game, JsonObject jbody) {
 		game.pass();
 		return "{}";
-
 	}
 	protected String undo(Request req, Response res, G game, JsonObject jbody) {
 		game.undo();
@@ -67,7 +66,7 @@ public abstract class GoAPI<G extends GameExtView> {
 	}
 
 	protected String get(Request req, Response res, G game) {
-		return parser.toJson(game.state());
+		return parser.toJson(game.getview());
 	}
 
 	public String put(Request req, Response res) {
