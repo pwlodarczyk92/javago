@@ -29,30 +29,25 @@ public abstract class BoardTest<B extends Board<Integer, ?>> {
 		B oldboard = createInstance(adj, new IntColor(adj), new IntColor(adj));
 		B board = createInstance(adj, new IntColor(adj), new IntColor(adj));
 
-		oldboard.put(1);  //   W
-		oldboard.put(-1); // B W
-		oldboard.put(2);  // B WW
-		oldboard.put(-2); //BB WW
-		oldboard.put(0);  //BBWWW
+		assert null != oldboard.put(1);  //   W
+		assert null != oldboard.put(-1); // B W
+		assert null != oldboard.put(2);  // B WW
+		assert null != oldboard.put(-2); //BB WW
+		assert null != oldboard.put(0);  //BBWWW
 
-		board.put(1);  //   W
-		board.put(-1); // B W
-		board.put(2);  // B WW
-		board.put(-2); //BB WW
-		board.put(0);  //BBWWW
+		assert null != board.put(1);  //   W
+		assert null != board.put(-1); // B W
+		assert null != board.put(2);  // B WW
+		assert null != board.put(-2); //BB WW
+		assert null != board.put(0);  //BBWWW
 
-		board.put(3);  //BBB  B
-		board.put(2);  //BBB WB
-		board.put(5); //BBB WB B
-		board.put(4); //BBB W WB
+		assert null != board.put(3);  //BBB  B
+		assert null != board.put(2);  //BBB WB
+		assert null != board.put(5); //BBB WB B
+		assert null != board.put(4); //BBB W WB
 
-		boolean fail = false;
-		try {
-			board.put(4); //BBB WB B - repeated
-		} catch (MoveNotAllowed e) {
-			fail = true;
-		}
-		assert fail;
+		assert null == board.put(4); //BBB WB B - repeated
+
 
 		board.undo(); //BBB WB B
 		board.undo(); //BBB WB

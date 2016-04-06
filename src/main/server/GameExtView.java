@@ -1,6 +1,7 @@
 package server;
 
 import core.board.Game;
+import core.primitives.MoveNotAllowed;
 import core.views.Parser;
 import core.views.State;
 
@@ -19,9 +20,13 @@ public class GameExtView implements ExtView {
 	}
 
 	@Override
-	public void put(int x, int y) { game.put(parser.fields.apply(x, y)); }
+	public void put(int x, int y) {
+		if (null == game.put(parser.fields.apply(x, y))) throw new MoveNotAllowed();
+	}
 	@Override
-	public void pass() { game.put(null); }
+	public void pass() {
+		if (null == game.put(null)) throw new MoveNotAllowed();
+	}
 	@Override
 	public void undo() { game.undo(); }
 	@Override

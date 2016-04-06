@@ -1,8 +1,5 @@
 package core.board;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import core.primitives.MoveNotAllowed;
 import core.primitives.Stone;
 import core.table.ITable;
 import org.slf4j.Logger;
@@ -117,7 +114,6 @@ public class Board<F, G> implements Game<F, G> {
 	private final LinkedList<BoardState<F, G>> history = new LinkedList<>();
 	private final LinkedList<F> moves = new LinkedList<>();
 	private final HashSet<ITable<F, G>> snaps = new HashSet<>();
-	private final Table<BoardState<F, G>, F, Map.Entry<Set<F>, BoardState<F, G>>> statecache = HashBasedTable.create();
 
 	public Board(ITable<F, G> table) {
 		this.currentstate = new BoardState<>(table);
@@ -128,37 +124,26 @@ public class Board<F, G> implements Game<F, G> {
 	@Override
 	public Set<F> put(F field) {
 
-		if (currentstate.passcounter > 2)
-			throw new MoveNotAllowed();
+		if (currentstate.passcounter > 2) return null;
 
 		BoardState<F, G> newstate;
 		Set<F> points;
 
 		if (field == null) {
 
-			points = null;
+			points = Collections.emptySet();
 			newstate = currentstate.nullstate();
 
 		} else {
 
-			Map.Entry<Set<F>, BoardState<F, G>> cachedata = statecache.get(currentstate, field);
+			ITable<F, G> newtable = currentstate.table.copy();
+			points = newtable.put(currentstate.currentstone, field);
 
-			if (cachedata == null) {
+			if (points == null) return null;
+			if (snaps.contains(newtable)) return null; //positional super-ko rule
+			snaps.add(newtable);
 
-				ITable<F, G> newtable = currentstate.table.copy();
-				points = newtable.put(currentstate.currentstone, field);
-				if (snaps.contains(newtable))
-					throw new MoveNotAllowed(); //positional super-ko rule
-				snaps.add(newtable);
-
-				newstate = currentstate.movestate(newtable, points);
-				cachedata = new AbstractMap.SimpleEntry<>(points, newstate);
-				statecache.put(currentstate, field, cachedata);
-
-			} else {
-				points = cachedata.getKey();
-				newstate = cachedata.getValue();
-			}
+			newstate = currentstate.movestate(newtable, points);
 
 		}
 
@@ -186,9 +171,6 @@ public class Board<F, G> implements Game<F, G> {
 
 	}
 
-	public void clear() {
-		statecache.clear();
-	}
 	//--game state modifiers--
 
 	//--accessors--

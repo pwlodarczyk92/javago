@@ -23,8 +23,8 @@ public class LogBoard<F, G> extends Board<F, G> {
 	@Override
 	public Set<F> put(F field) {
 		Set<F> result = super.put(field);
-		if (this.islogging.get())
-			logger.info(statelogger.apply(currentstate));
+		if (this.islogging.get() && result != null)
+			logger.warn(statelogger.apply(currentstate));
 		return result;
 	}
 
@@ -32,7 +32,7 @@ public class LogBoard<F, G> extends Board<F, G> {
 	public F undo() {
 		F result = super.undo();
 		if (this.islogging.get())
-			logger.info(statelogger.apply(currentstate));
+			logger.warn(statelogger.apply(currentstate));
 		return result;
 	}
 

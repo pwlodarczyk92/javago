@@ -32,27 +32,27 @@ public abstract class TableTest {
 		ColorView<Integer, ?> w = table.getview(Stone.WHITE);
 		ColorView<Integer, ?> b = table.getview(Stone.BLACK);
 
-		table.put(Stone.WHITE, 1);
+		assert null != table.put(Stone.WHITE, 1);
 		assert w.getallnodes().equals(mkset(1));
 		assert b.getallnodes().equals(mkset());
 
-		table.put(Stone.WHITE, 2);
+		assert null != table.put(Stone.WHITE, 2);
 		assert w.getallnodes().equals(mkset(1, 2));
 		assert b.getallnodes().equals(mkset());
 
-		table.put(Stone.BLACK, 0);
+		assert null != table.put(Stone.BLACK, 0);
 		assert w.getallnodes().equals(mkset(1, 2));
 		assert b.getallnodes().equals(mkset(0));
 
-		table.put(Stone.BLACK, 3);
+		assert null != table.put(Stone.BLACK, 3);
 		assert w.getallnodes().equals(mkset());
 		assert b.getallnodes().equals(mkset(0, 3));
 
-		table.put(Stone.WHITE, 2);
+		assert null != table.put(Stone.WHITE, 2);
 		assert w.getallnodes().equals(mkset(2));
 		assert b.getallnodes().equals(mkset(0, 3));
 
-		table.put(Stone.WHITE, 4);
+		assert null != table.put(Stone.WHITE, 4);
 		assert w.getallnodes().equals(mkset(2, 4));
 		assert b.getallnodes().equals(mkset(0));
 	}

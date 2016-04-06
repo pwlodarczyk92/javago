@@ -14,9 +14,13 @@ import java.util.HashMap;
  */
 public class Scoring {
 
+	private static final int libmax = 4;
+	private static final int count = 3;
+	private static final int overflow = 15;
+
 	public static <F> HashMap<F, Double> safety(Game<F, ?> board) {
 
-		HashMap<F, Integer> data = Safety.safety(board, 3, 5, 50);
+		HashMap<F, Integer> data = Safety.safety(board, libmax, count, overflow);
 		HashMap<F, Double> result = new HashMap<>();
 
 		for(F field: data.keySet()) {

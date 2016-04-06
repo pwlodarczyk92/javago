@@ -84,6 +84,8 @@ public class Color<Field> implements IColor<Field, Field>{
 	@Override
 	public Field addstone(Field node) {
 
+		assert !roots.containsKey(node);
+
 		Field maxroot = null;
 		int maxgroupsize = 0;
 		HashSet<Field> checkedroots = new HashSet<>();

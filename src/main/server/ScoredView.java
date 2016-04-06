@@ -2,6 +2,7 @@ package server;
 
 import bot.GameScore;
 import bot.Score;
+import core.board.Board;
 import core.board.Game;
 import core.views.Parser;
 import core.views.ScoredState;

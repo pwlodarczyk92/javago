@@ -16,7 +16,7 @@ public class GameManager<F, G> {
 	final private static Logger logger = LoggerFactory.getLogger(GameManager.class.getName());
 
 	private final Game<F, G> board;
-	private final Game<F, G> internalboard;
+	protected final Game<F, G> internalboard;
 
 	public GameManager(Game<F, G> board, Game<F, G> emptyboard) {
 		this.board = board;
@@ -51,9 +51,9 @@ public class GameManager<F, G> {
 		for (int i = delnum; i>0; i--)
 			internalboard.undo(); //remove wrong moves
 		if(different != null)
-			internalboard.put(different); //make last misaligned move
+			assert internalboard.put(different) != null; //make last misaligned move
 		while (biter.hasNext())
-			internalboard.put(biter.next()); //make rest of the unchecked board moves
+			assert internalboard.put(biter.next()) != null; //make rest of the unchecked board moves
 
 		assert aligned(); //this is actually what this method does.
 

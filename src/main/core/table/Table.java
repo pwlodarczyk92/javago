@@ -103,7 +103,7 @@ public class Table<F, G> implements ITable<F, G> {
 		IColor<F, G> enemy = stone == Stone.BLACK ? whites : blacks;
 
 		if (player.contains(field) || enemy.contains(field))
-			throw new MoveNotAllowed();
+			return null;
 
 		Collection<F> adjacent = adjacency.apply(field);
 		boolean moveok = false;
@@ -132,7 +132,7 @@ public class Table<F, G> implements ITable<F, G> {
 			}
 		}
 
-		if (!moveok) throw new MoveNotAllowed();
+		if (!moveok) return null;
 
 		player.addstone(field);
 		return removed_stones;
