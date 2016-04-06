@@ -30,6 +30,16 @@ public class Table<F, G> implements ITable<F, G> {
 
 	//--accessors--
 	@Override
+	public int emptyadjacents(F field) {
+		int i = 0;
+		for(F a: adjacency.apply(field)) {
+			if (getstone(a) == Stone.EMPTY)
+				i+=1;
+		}
+		return i;
+	}
+
+	@Override
 	public Stone getstone(F field) {
 		if (whites.contains(field)) return Stone.WHITE;
 		if (blacks.contains(field)) return Stone.BLACK;
@@ -62,7 +72,6 @@ public class Table<F, G> implements ITable<F, G> {
 	public Function<F, Collection<F>> getadjacency() {
 		return adjacency;
 	}
-
 	//--accessors--
 
 	private Set<F> getlibs_bygroup(IColor<F, G> main, IColor<F, G> substract, G group) {
@@ -85,6 +94,7 @@ public class Table<F, G> implements ITable<F, G> {
 	}
 
 
+	//--modifiers--
 	@Override
 	public Set<F> put(Stone stone, F field) {
 
@@ -128,8 +138,10 @@ public class Table<F, G> implements ITable<F, G> {
 		return removed_stones;
 
 	}
+	//--modifiers--
 
 
+	// --identity, equality--
 	@Override
 	public Table<F, G> copy() {
 		IColor<F, G> wc = whites.copy();
@@ -154,4 +166,5 @@ public class Table<F, G> implements ITable<F, G> {
 	public int hashCode() {
 		return 19 * whites.hashCode() + blacks.hashCode();
 	}
+	// --identity, equality--
 }

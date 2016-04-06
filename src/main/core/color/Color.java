@@ -36,7 +36,7 @@ public class Color<Field> implements IColor<Field, Field>{
 		this.liberties = liberties;
 	}
 
-	//--interface--
+	//--accessors--
 	@Override
 	public Field getgroup(Field node) {
 		return roots.get(node);
@@ -65,7 +65,9 @@ public class Color<Field> implements IColor<Field, Field>{
 	public boolean contains(Field node) {
 		return roots.containsKey(node);
 	}
+	//--accessors--
 
+	//--modifiers--
 	@Override
 	public Set<Field> remgroup(Field root) {
 
@@ -152,7 +154,7 @@ public class Color<Field> implements IColor<Field, Field>{
 		return node;
 
 	}
-	// --interface--
+	// --modifiers--
 
 	// --identity, equality--
 	@Override

@@ -18,5 +18,6 @@ public interface TableView<F, G> {
 	public ColorView<F, G> getview(Stone s);
 	public Stone getstone(F field);
 	public Set<F> getlibs(Stone s, G group);
+	public int emptyadjacents(F field);
 
 }

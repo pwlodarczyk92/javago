@@ -17,12 +17,12 @@ public class Board<F, G> implements Game<F, G> {
 
 	protected static class BoardState<F, G> implements StateView<F, G> {
 
-		private int hash;
-		private ITable<F, G> table;
-		private Stone currentstone;
-		private Integer whitepoints;
-		private Integer blackpoints;
-		private Integer passcounter;
+		private final ITable<F, G> table;
+		private final Stone currentstone;
+		private final Integer whitepoints;
+		private final Integer blackpoints;
+		private final Integer passcounter;
+		private final int hash;
 
 		public BoardState(ITable<F, G> table) {
 			this.table = table;
@@ -30,6 +30,7 @@ public class Board<F, G> implements Game<F, G> {
 			this.whitepoints = 0;
 			this.blackpoints = 0;
 			this.passcounter = 0;
+			this.hash = hash();
 		}
 
 		public BoardState(ITable<F, G> table, Integer whitepoints, Integer blackpoints, Integer passcounter, Stone currentstone) {
@@ -113,10 +114,10 @@ public class Board<F, G> implements Game<F, G> {
 	final protected Logger logger = LoggerFactory.getLogger(Board.class.getName());
 
 	protected BoardState<F, G> currentstate;
-	private LinkedList<BoardState<F, G>> history = new LinkedList<>();
-	private LinkedList<F> moves = new LinkedList<>();
-	private HashSet<ITable<F, G>> snaps = new HashSet<>();
-	private Table<BoardState<F, G>, F, Map.Entry<Set<F>, BoardState<F, G>>> statecache = HashBasedTable.create();
+	private final LinkedList<BoardState<F, G>> history = new LinkedList<>();
+	private final LinkedList<F> moves = new LinkedList<>();
+	private final HashSet<ITable<F, G>> snaps = new HashSet<>();
+	private final Table<BoardState<F, G>, F, Map.Entry<Set<F>, BoardState<F, G>>> statecache = HashBasedTable.create();
 
 	public Board(ITable<F, G> table) {
 		this.currentstate = new BoardState<>(table);
@@ -145,11 +146,11 @@ public class Board<F, G> implements Game<F, G> {
 			if (cachedata == null) {
 
 				ITable<F, G> newtable = currentstate.table.copy();
+				points = newtable.put(currentstate.currentstone, field);
 				if (snaps.contains(newtable))
 					throw new MoveNotAllowed(); //positional super-ko rule
 				snaps.add(newtable);
 
-				points = newtable.put(currentstate.currentstone, field);
 				newstate = currentstate.movestate(newtable, points);
 				cachedata = new AbstractMap.SimpleEntry<>(points, newstate);
 				statecache.put(currentstate, field, cachedata);
@@ -179,8 +180,14 @@ public class Board<F, G> implements Game<F, G> {
 		if (lastmove != null)
 			snaps.remove(laststate.table);
 
+		assert snaps.size()<=moves().size();
+
 		return lastmove;
 
+	}
+
+	public void clear() {
+		statecache.clear();
 	}
 	//--game state modifiers--
 
