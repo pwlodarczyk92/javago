@@ -1,11 +1,10 @@
-package bot.algos;
+package algos.immortal;
 
 import core.color.ColorView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -36,17 +35,17 @@ public class Immortal {
 
 	final private static Logger logger = LoggerFactory.getLogger(Immortal.class.getName());
 
-	// to kill a group, it must be surrounded by collection of enemy's stones.
+	// to kill a group, it must be surrounded by a collection of enemy's stones.
 	// they can be grouped by adjacency just like other stones on the board
 	// we call these groups kill groups
-	// and liberties - all fields adjacent to kill group minus fields of the group that is to be killed.
+	// and all fields adjacent to kill group minus fields of the group that is to be killed - liberties.
 
 	// killgrouplibs returns list of killgroups and their liberties for given group that is to be killed
 
-	private static <F, G> List<KillGroup<F>> killgrouplibs(Function<F, Collection<F>> adjacency, ColorView<F, G> colorview, G group) {
+	private static <F, G> List<KillGroup<F>> killgrouplibs(ColorView<F, G> colorview, G group) {
 
 		Set<F> grouplibs = colorview.getadjacent(group);
-		Set<F> groupnodes = colorview.getnodes(group);
+		Set<F> groupnodes = colorview.getstones(group);
 
 		Set<F> leftlibs = new HashSet<>(grouplibs);
 		List<KillGroup<F>> kglibs = new ArrayList<>();
@@ -69,7 +68,7 @@ public class Immortal {
 				killfront.remove(killfield);
 				leftlibs.remove(killfield);
 
-				for (F killadj : adjacency.apply(killfield)) {
+				for (F killadj : colorview.adjacency(killfield)) {
 
 					if (killgroup.contains(killadj)) // node already traversed
 						continue;
@@ -122,13 +121,13 @@ public class Immortal {
 
 	//returns set of immortal groups of given color
 
-	public static <F, G> Result<F, G> immortals(Function<F, Collection<F>> adjacency, ColorView<F, G> colorview) {
+	public static <F, G> Result<F, G> get(ColorView<F, G> colorview) {
 
-		Set<G> groups = colorview.getgroups();
+		Set<G> groups = colorview.getallgroups();
 
 		HashMap<G, List<KillGroup<F>>> kglibs = new HashMap<>();
 		for(G group: groups)
-			kglibs.put(group, killgrouplibs(adjacency, colorview, group));
+			kglibs.put(group, killgrouplibs(colorview, group));
 
 		Set<G> unchecked = new HashSet<>(groups);
 		Set<G> probablyimmo = new HashSet<>();
@@ -143,8 +142,10 @@ public class Immortal {
 			List<KillGroup<F>> deadkgs = deadkillgrouplibs(kglibs.get(group), colorview, notimmo);
 
 			if (deadkgs.size()>1) {
+
 				probablyimmo.add(group);
 				deadkgs.forEach(kg -> points.add(kg.nodes));
+
 			} else {
 
 				unchecked.addAll(probablyimmo);
@@ -155,7 +156,6 @@ public class Immortal {
 
 		}
 
-		logger.debug("finally points taken: {}", points.size());
 		return new Result<>(probablyimmo, points);
 
 	}
