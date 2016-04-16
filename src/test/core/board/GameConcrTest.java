@@ -1,15 +1,9 @@
 package core.board;
 
-import com.google.common.collect.ContiguousSet;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.Range;
-import core.board.GameTest;
-import core.board.Game;
 import core.color.Color;
 import core.table.Table;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
 /**

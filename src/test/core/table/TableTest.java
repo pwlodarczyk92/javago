@@ -6,7 +6,6 @@ import com.google.common.collect.Range;
 import core.Stone;
 import core.color.Color;
 import core.color.ColorView;
-import core.table.ITable;
 
 import java.util.Arrays;
 import java.util.Collection;

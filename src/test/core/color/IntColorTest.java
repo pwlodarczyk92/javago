@@ -1,7 +1,6 @@
 package core.color;
 
 import com.google.common.collect.Collections2;
-import core.color.IColor;
 import org.junit.Before;
 
 import java.util.*;

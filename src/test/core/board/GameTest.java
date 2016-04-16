@@ -3,9 +3,7 @@ package core.board;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
-import core.board.IGame;
 import core.color.Color;
-
 
 import java.util.Arrays;
 import java.util.Collection;

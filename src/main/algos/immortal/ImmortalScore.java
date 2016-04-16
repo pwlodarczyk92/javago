@@ -1,8 +1,8 @@
 package algos.immortal;
 
+import core.Stone;
 import core.board.IGame;
 import core.color.ColorView;
-import core.Stone;
 
 import java.util.HashMap;
 

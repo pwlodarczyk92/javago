@@ -1,15 +1,8 @@
 package core.table;
 
-import com.google.common.collect.ContiguousSet;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.Range;
 import core.color.Color;
-import core.table.ITable;
-import core.table.Table;
-import core.table.TableTest;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
 /**
