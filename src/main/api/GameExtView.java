@@ -44,14 +44,14 @@ public class GameExtView<F> implements ExtView {
 	public synchronized void undo() { game.undo(); }
 
 	@Override
-	public synchronized Snap getview() {
-		return getview(null);
+	public synchronized Snap getView() {
+		return getView(null);
 	}
 
 	@Override
-	public synchronized Snap getview(Score score) {
+	public synchronized Snap getView(Score score) {
 		Snap state = new Snap();
-		parser.update(state, game.getstate());
+		parser.update(state, game.getState());
 		if (score != null && scorer == null)
 			throw new ScoreNotAllowed();
 		if (score != null)

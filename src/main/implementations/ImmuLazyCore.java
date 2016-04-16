@@ -12,8 +12,8 @@ public class ImmuLazyCore extends Core {
 	}
 
 	@Override
-	public ImmuLazyColor<Integer> makecolor() {
-		return new ImmuLazyColor<>(fields::adjacent);
+	public ImmuLazyColor<Integer> makeColor() {
+		return new ImmuLazyColor<>(fields::getAdjacency);
 	}
 
 }

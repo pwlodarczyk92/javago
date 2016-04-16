@@ -11,56 +11,56 @@ import java.util.function.Function;
  */
 public abstract class IntColorTest<G>{
 
-	private static class LinAdj implements Function<Integer, Collection<Integer>> {
+	private static class LinearAdjacency implements Function<Integer, Collection<Integer>> {
 		@Override
 		public Collection<Integer> apply(Integer integer) {
 			return Arrays.asList(integer - 1, integer + 1);
 		}
 	}
 
-	private Function<Integer, Collection<Integer>> adj = new LinAdj();
+	private Function<Integer, Collection<Integer>> adjacency = new LinearAdjacency();
 	private IColor<Integer, G> instance;
 
 	protected abstract IColor<Integer, G> createInstance(Function<Integer, Collection<Integer>> adjacency);
 
 	@Before
 	public final void setUp() {
-		this.instance = createInstance(new LinAdj());
+		this.instance = createInstance(new LinearAdjacency());
 	}
 
 	@org.junit.Test
 	public final void singletonTest() {
 
-		instance.addstone(3);
-		G group = instance.getgroup(3);
+		instance.addStone(3);
+		G group = instance.getGroup(3);
 
-		assert instance.getallstones().equals(mkset(3));
-		assert instance.getstones(group).equals(mkset(3));
-		assert instance.getadjacent(group).equals(mkset(2, 4));
+		assert instance.getFields().equals(mkSet(3));
+		assert instance.getFields(group).equals(mkSet(3));
+		assert instance.getAdjacents(group).equals(mkSet(2, 4));
 	}
 
 	@org.junit.Test
 	public final void singleGroupTest() {
 
-		HashSet<Integer> group = mkset(3, 4, 5, 6);
+		HashSet<Integer> group = mkSet(3, 4, 5, 6);
 
-		for(List<Integer> perm: Collections2.permutations(group)) {
+		for(List<Integer> permutation: Collections2.permutations(group)) {
 
-			IColor<Integer, G> inst = createInstance(adj);
+			IColor<Integer, G> localInstance = createInstance(adjacency);
 
-			for (Integer i: perm) {
-				inst.addstone(i);
+			for (Integer i: permutation) {
+				localInstance.addStone(i);
 			}
 
-			assert inst.getallstones().equals(group);
+			assert localInstance.getFields().equals(group);
 
-			G root1 = inst.getgroup(perm.get(0));
-			for (Integer i: perm) {
-				assert inst.getgroup(i).equals(root1);
+			G root1 = localInstance.getGroup(permutation.get(0));
+			for (Integer i: permutation) {
+				assert localInstance.getGroup(i).equals(root1);
 			}
 
-			inst.remgroup(root1);
-			assert inst.getallstones().isEmpty();
+			localInstance.removeGroup(root1);
+			assert localInstance.getFields().isEmpty();
 
 		}
 	}
@@ -68,70 +68,70 @@ public abstract class IntColorTest<G>{
 	@org.junit.Test
 	public final void twoGroupTest() {
 
-		HashSet<Integer> groups = mkset(3, 4, 7, 6);
+		HashSet<Integer> groups = mkSet(3, 4, 7, 6);
 
 		for(List<Integer> perm: Collections2.permutations(groups)) {
 
-			IColor<Integer, G> inst = createInstance(adj);
+			IColor<Integer, G> localInstance = createInstance(adjacency);
 			for (Integer i: perm) {
-				inst.addstone(i);
+				localInstance.addStone(i);
 			}
 
-			assert inst.getallstones().equals(groups);
+			assert localInstance.getFields().equals(groups);
 
-			assert Objects.equals(inst.getgroup(3), inst.getgroup(4));
-			assert Objects.equals(inst.getgroup(6), inst.getgroup(7));
-			assert !Objects.equals(inst.getgroup(7), inst.getgroup(4));
-			assert !Objects.equals(inst.getgroup(7), inst.getgroup(3));
-			assert !Objects.equals(inst.getgroup(6), inst.getgroup(4));
-			assert !Objects.equals(inst.getgroup(6), inst.getgroup(3));
+			assert Objects.equals(localInstance.getGroup(3), localInstance.getGroup(4));
+			assert Objects.equals(localInstance.getGroup(6), localInstance.getGroup(7));
+			assert !Objects.equals(localInstance.getGroup(7), localInstance.getGroup(4));
+			assert !Objects.equals(localInstance.getGroup(7), localInstance.getGroup(3));
+			assert !Objects.equals(localInstance.getGroup(6), localInstance.getGroup(4));
+			assert !Objects.equals(localInstance.getGroup(6), localInstance.getGroup(3));
 
-			inst.remgroup(inst.getgroup(3));
-			assert inst.getallstones().equals(mkset(6, 7));
+			localInstance.removeGroup(localInstance.getGroup(3));
+			assert localInstance.getFields().equals(mkSet(6, 7));
 
 		}
 	}
 
 	@org.junit.Test
-	public final void copyTest() {
+	public final void forkTest() {
 
-		HashSet<Integer> groups = mkset(3, 4, 7, 6);
+		HashSet<Integer> groups = mkSet(3, 4, 7, 6);
 
-		for(List<Integer> perm: Collections2.permutations(groups)) {
+		for(List<Integer> permutation: Collections2.permutations(groups)) {
 
-			IColor<Integer, G> inst = createInstance(adj);
-			for (Integer i: perm) {
-				inst.addstone(i);
+			IColor<Integer, G> instance = createInstance(adjacency);
+			for (Integer i: permutation) {
+				instance.addStone(i);
 			}
 
-			IColor<Integer, G> instc = inst.fork();
+			IColor<Integer, G> instanceFork = instance.fork();
 
-			assert inst.getallstones().equals(groups);
-			assert instc.getallstones().equals(groups);
+			assert instance.getFields().equals(groups);
+			assert instanceFork.getFields().equals(groups);
 
-			assert Objects.equals(inst.getgroup(3), inst.getgroup(4));
-			assert Objects.equals(inst.getgroup(6), inst.getgroup(7));
-			assert !Objects.equals(inst.getgroup(7), inst.getgroup(4));
-			assert !Objects.equals(inst.getgroup(7), inst.getgroup(3));
-			assert !Objects.equals(inst.getgroup(6), inst.getgroup(4));
-			assert !Objects.equals(inst.getgroup(6), inst.getgroup(3));
+			assert Objects.equals(instance.getGroup(3), instance.getGroup(4));
+			assert Objects.equals(instance.getGroup(6), instance.getGroup(7));
+			assert !Objects.equals(instance.getGroup(7), instance.getGroup(4));
+			assert !Objects.equals(instance.getGroup(7), instance.getGroup(3));
+			assert !Objects.equals(instance.getGroup(6), instance.getGroup(4));
+			assert !Objects.equals(instance.getGroup(6), instance.getGroup(3));
 
-			assert Objects.equals(instc.getgroup(3), instc.getgroup(4));
-			assert Objects.equals(instc.getgroup(6), instc.getgroup(7));
-			assert !Objects.equals(instc.getgroup(7), instc.getgroup(4));
-			assert !Objects.equals(instc.getgroup(7), instc.getgroup(3));
-			assert !Objects.equals(instc.getgroup(6), instc.getgroup(4));
-			assert !Objects.equals(instc.getgroup(6), instc.getgroup(3));
+			assert Objects.equals(instanceFork.getGroup(3), instanceFork.getGroup(4));
+			assert Objects.equals(instanceFork.getGroup(6), instanceFork.getGroup(7));
+			assert !Objects.equals(instanceFork.getGroup(7), instanceFork.getGroup(4));
+			assert !Objects.equals(instanceFork.getGroup(7), instanceFork.getGroup(3));
+			assert !Objects.equals(instanceFork.getGroup(6), instanceFork.getGroup(4));
+			assert !Objects.equals(instanceFork.getGroup(6), instanceFork.getGroup(3));
 
-			inst.remgroup(inst.getgroup(3));
-			assert inst.getallstones().equals(mkset(6, 7));
-			assert instc.getallstones().equals(groups);
+			instance.removeGroup(instance.getGroup(3));
+			assert instance.getFields().equals(mkSet(6, 7));
+			assert instanceFork.getFields().equals(groups);
 
 		}
 	}
 
 	@SafeVarargs
-	private final <F> HashSet<F> mkset(F... elems) {
+	private final <F> HashSet<F> mkSet(F... elems) {
 		return new HashSet<>(Arrays.asList(elems));
 	}
 

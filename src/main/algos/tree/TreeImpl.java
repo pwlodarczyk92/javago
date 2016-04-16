@@ -15,7 +15,7 @@ public class TreeImpl {
 
 	final static protected Logger logger = LoggerFactory.getLogger(TreeImpl.class.getName());
 
-	public static double pow(int val) {
+	private static double discreteLibScore(int val) {
 		switch (val) {
 			case 0: return -1.0;
 			case 1: return -1/2.0;
@@ -25,38 +25,38 @@ public class TreeImpl {
 		}
 	}
 
-	public static double expfunc(double libs) {
+	public static double libertyScore(double libs) {
 		if (libs <= 0.0) return -1.0;
 		if (libs >= 4.0) return 0.0;
 
 		int low = (int) Math.floor(libs);
 		int high = (int) Math.ceil(libs);
 		if (low == high)
-			return pow(low);
+			return discreteLibScore(low);
 		if (high-low != 1) throw new RuntimeException();
 
-		double lowcoef = high-libs;
-		double highcoef = libs-low;
-		return pow(low) * lowcoef + pow(high) * highcoef;
+		double lowCoef = high-libs;
+		double highCoef = libs-low;
+		return discreteLibScore(low) * lowCoef + discreteLibScore(high) * highCoef;
 	}
 
-	public static <F, G> double scorefunc(IState<F, G> state) {
+	public static <F, G> double scoreFunction(IState<F, G> state) {
 
 		double result = 0;
 
-		TableView<F, G> view = state.gettable();
-		ColorView<F, G> wview = view.getview(Stone.WHITE);
-		ColorView<F, G> bview = view.getview(Stone.BLACK);
+		TableView<F, G> view = state.getTable();
+		ColorView<F, G> wview = view.getView(Stone.WHITE);
+		ColorView<F, G> bview = view.getView(Stone.BLACK);
 
-		for (G group: wview.getallgroups()) {
-			int libsize = view.getlibs(Stone.WHITE, group).size();
-			result += wview.getstones(group).size() * expfunc(libsize);
+		for (G group: wview.getGroups()) {
+			int libsize = view.getLiberties(Stone.WHITE, group).size();
+			result += wview.getFields(group).size() * libertyScore(libsize);
 		}
-		for (G group: bview.getallgroups()) {
-			int libsize = view.getlibs(Stone.BLACK, group).size();
-			result -= bview.getstones(group).size() * expfunc(libsize);
+		for (G group: bview.getGroups()) {
+			int libsize = view.getLiberties(Stone.BLACK, group).size();
+			result -= bview.getFields(group).size() * libertyScore(libsize);
 		}
-		return result + (state.getwhitepoints() - state.getblackpoints());
+		return result + (state.getWhitePoints() - state.getBlackPoints());
 
 	}
 

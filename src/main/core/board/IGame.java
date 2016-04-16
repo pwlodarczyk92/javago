@@ -12,7 +12,7 @@ public interface IGame<F, G> extends Forkable<IGame<F, G>> {
 	public Set<F> put(F field);
 	public F undo();
 
-	public IState<F, G> getstate();
-	public List<F> moves();
-	public boolean superkoviolation(IState<F, G> state);
+	public IState<F, G> getState();
+	public List<F> getMoves();
+	public boolean isKoViolatedBy(IState<F, G> state);
 }

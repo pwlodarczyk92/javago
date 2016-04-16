@@ -17,23 +17,23 @@ public class AtariExpander {
 
 		Set<F> ataris = new HashSet<>();
 		Set<Node<F, IState<F, G>>> result = new HashSet<>();
-		TableView<F, G> view = node.state.gettable();
-		Stone now = node.state.getcurrentstone();
+		TableView<F, G> view = node.state.getTable();
+		Stone now = node.state.getCurrentStone();
 
-		view.getview(now).getallgroups().stream().forEach(g -> {
-			Set<F> libs = view.getlibs(now, g);
+		view.getView(now).getGroups().stream().forEach(g -> {
+			Set<F> libs = view.getLiberties(now, g);
 			if (libs.size() == 1) ataris.addAll(libs);
 		});
 
-		view.getview(now.opposite()).getallgroups().stream().forEach(g -> {
-			Set<F> libs = view.getlibs(now.opposite(), g);
+		view.getView(now.opposite()).getGroups().stream().forEach(g -> {
+			Set<F> libs = view.getLiberties(now.opposite(), g);
 			if (libs.size() <= 2) {
 				ataris.addAll(libs);
 			}
 		});
 
 		for (F field: ataris) {
-			Node<F, IState<F, G>> newnode = tree.moveto(node, field);
+			Node<F, IState<F, G>> newnode = tree.makeMove(node, field);
 			if (newnode != null) result.add(newnode);
 		}
 

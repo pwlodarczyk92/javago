@@ -19,18 +19,18 @@ public class TreeScore {
 
 
 	public static <F> HashMap<F, Double> score(IGame<F, ?> board) {
-		return helper(board);
+		return _score(board);
 	}
 
-	private static <F, G> HashMap<F, Double> helper(IGame<F, G> board) {
+	private static <F, G> HashMap<F, Double> _score(IGame<F, G> board) {
 
-		TreeGame<F, G> tb = new TreeGame<>(board, TreeImpl::scorefunc);
+		TreeGame<F, G> tb = new TreeGame<>(board, TreeImpl::scoreFunction);
 		HashMap<F, Double> result = ScoreExpander.expand(tb, (tree, node) -> AdjExpander.expandbulk(tree, node, 1));
 		Double zeroscore = result.remove(null);
 
-		logger.info("current score: {}", TreeImpl.scorefunc(board.getstate()));
+		logger.info("current score: {}", TreeImpl.scoreFunction(board.getState()));
 		logger.info("zero score   : {}", zeroscore);
-		logger.info("best score   : {}", tb.root.score());
+		logger.info("best score   : {}", tb.root.getScore());
 
 		CollectionUtils.normalize(result, zeroscore, false);
 		return result;

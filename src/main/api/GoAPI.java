@@ -109,12 +109,12 @@ public class GoAPI<G extends GameExtView> {
 
 		String rawscore = request.queryParams("score");
 		if (rawscore == null) {
-			return parser.toJson(game.getview());
+			return parser.toJson(game.getView());
 		} else try {
 			Score scoretype;
 			try { scoretype = Score.valueOf(rawscore); }
 			catch (IllegalArgumentException e) { throw new ScoreNotAllowed(e); }
-			return parser.toJson(game.getview(scoretype));
+			return parser.toJson(game.getView(scoretype));
 		} catch (ScoreNotAllowed e) {
 			logger.warn("score argument is probably malformed", e);
 			halt(422, "{}");

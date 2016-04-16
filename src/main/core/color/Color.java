@@ -11,8 +11,8 @@ public class Color<Field> implements IColor<Field, Field>{
 
 	//--internal structure--
 	protected HashMap<Field, Field> roots;
-	protected HashMap<Field, Set<Field>> families;
-	protected HashMap<Field, Set<Field>> liberties;
+	protected HashMap<Field, Set<Field>> fields;
+	protected HashMap<Field, Set<Field>> adjacents;
 	//--internal structure--
 
 	//--Field interface--
@@ -28,135 +28,136 @@ public class Color<Field> implements IColor<Field, Field>{
 
 	protected Color(Function<Field, Collection<Field>> adjacency,
 					HashMap<Field, Field> roots,
-					HashMap<Field, Set<Field>> families,
-					HashMap<Field, Set<Field>> liberties) {
+					HashMap<Field, Set<Field>> fields,
+					HashMap<Field, Set<Field>> adjacents) {
 		this.adjacency = adjacency;
 		this.roots = roots;
-		this.families = families;
-		this.liberties = liberties;
+		this.fields = fields;
+		this.adjacents = adjacents;
 	}
 
 	//--accessors--
 	@Override
-	public Field getgroup(Field node) {
-		return roots.get(node);
+	public Field getGroup(Field field) {
+		return roots.get(field);
 	}
+	@Override
+	public Collection<Field> getAdjacency(Field field) { return adjacency.apply(field); }
 
 	@Override
-	public Set<Field> getstones(Field root) {
-		return families.get(root);
+	public Set<Field> getFields(Field root) {
+		return fields.get(root);
 	}
 	@Override
-	public Set<Field> getadjacent(Field root) {
-		return liberties.get(root);
+	public Set<Field> getAdjacents(Field root) {
+		return adjacents.get(root);
 	}
 	@Override
-	public Field getanystone(Field group) {
+	public Field getAnyField(Field group) {
 		return group;
 	}
 
 	@Override
-	public Set<Field> getallstones() {
+	public Set<Field> getFields() {
 		return roots.keySet();
 	}
 	@Override
-	public Set<Field> getallgroups() {
-		return families.keySet();
+	public Set<Field> getGroups() {
+		return fields.keySet();
 	}
 
 	@Override
-	public boolean contains(Field node) {
-		return roots.containsKey(node);
+	public boolean contains(Field field) {
+		return roots.containsKey(field);
 	}
-	@Override
-	public Collection<Field> adjacency(Field node) { return adjacency.apply(node); }
+
 	//--accessors--
 
 	//--modifiers--
 	@Override
-	public Set<Field> remgroup(Field root) {
+	public Set<Field> removeGroup(Field root) {
 
 		assert roots.get(root) == root;
 
-		Set<Field> family = families.remove(root);
-		family.stream().forEach(roots::remove);
-		liberties.remove(root);
+		Set<Field> newFields = this.fields.remove(root);
+		newFields.stream().forEach(roots::remove);
+		adjacents.remove(root);
 
-		return family;
+		return newFields;
 
 	}
 
 	@Override
-	public Field addstone(Field node) {
+	public Field addStone(Field field) {
 
-		assert !roots.containsKey(node);
+		assert !roots.containsKey(field);
 
-		Field maxroot = null;
-		int maxgroupsize = 0;
-		HashSet<Field> checkedroots = new HashSet<>();
+		Field maxRoot = null;
+		int maxGroupSize = 0;
+		HashSet<Field> traversedRoots = new HashSet<>();
 
 		// for every group adjacent to a new stone
 		// find biggest one and its root
-		// save all traversed roots to <checkedroots>
+		// save all traversed roots to <traversedRoots>
 
-		for (Field adjacent: adjacency.apply(node)) {
+		for (Field adjacent: adjacency.apply(field)) {
 			if (!this.contains(adjacent))
 				continue;
 
-			Field adjroot = this.roots.get(adjacent);
-			if (checkedroots.contains(adjroot))
+			Field adjacentsRoot = this.roots.get(adjacent);
+			if (traversedRoots.contains(adjacentsRoot))
 				continue;
-			checkedroots.add(adjroot);
+			traversedRoots.add(adjacentsRoot);
 
-			int nowgroupsize = families.get(adjroot).size();
-			if (maxgroupsize < nowgroupsize) {
-				maxroot = adjroot;
-				maxgroupsize = nowgroupsize;
+			int adjacentGroupSize = fields.get(adjacentsRoot).size();
+			if (maxGroupSize < adjacentGroupSize) {
+				maxRoot = adjacentsRoot;
+				maxGroupSize = adjacentGroupSize;
 			}
 		}
 
 		// no neighbors - make and return simple singleton
 
-		if (maxroot == null) {
-			HashSet<Field> family = new HashSet<>();
-			family.add(node);
-			families.put(node, family);
-			liberties.put(node, new HashSet<>(adjacency.apply(node)));
-			roots.put(node, node);
-			return node;
+		if (maxRoot == null) {
+			HashSet<Field> newFields = new HashSet<>();
+			newFields.add(field);
+			fields.put(field, newFields);
+			adjacents.put(field, new HashSet<>(adjacency.apply(field)));
+			roots.put(field, field);
+			return field;
 		}
 
-		// else - make one big group from neighbors and new node;
-		// merge families and liberties sets by adding
-		// families and liberties of smaller groups to maxroot's ones
+		// else - make one big group from neighbors and new field;
+		// merge fields and adjacents sets by adding
+		// fields and adjacents of smaller groups to maxRoot's ones
 
-		checkedroots.remove(maxroot);
-		Set<Field> maxfamily = families.get(maxroot);
-		Set<Field> maxliberties = liberties.get(maxroot);
+		traversedRoots.remove(maxRoot);
+		Set<Field> maxFields = fields.get(maxRoot);
+		Set<Field> maxAdjacents = adjacents.get(maxRoot);
 
-		for (Field subroot: checkedroots) {
+		for (Field subRoot: traversedRoots) {
 
-			maxliberties.addAll(liberties.remove(subroot));
-			Set<Field> nowfam = families.remove(subroot);
-			maxfamily.addAll(nowfam);
+			maxAdjacents.addAll(adjacents.remove(subRoot));
+			Set<Field> subFields = fields.remove(subRoot);
+			maxFields.addAll(subFields);
 
-			for (Field n: nowfam)
-				roots.put(n, maxroot);
+			for (Field n: subFields)
+				roots.put(n, maxRoot);
 
 		}
 
-		// include node (the one from args) related changes in the sets
+		// include field (the one from args) related changes in the sets
 
-		for (Field adjacent: adjacency.apply(node)) {
+		for (Field adjacent: adjacency.apply(field)) {
 			if (!this.contains(adjacent))
-				maxliberties.add(adjacent);
+				maxAdjacents.add(adjacent);
 		}
 
-		maxliberties.remove(node);
-		maxfamily.add(node);
-		roots.put(node, maxroot);
+		maxAdjacents.remove(field);
+		maxFields.add(field);
+		roots.put(field, maxRoot);
 
-		return maxroot;
+		return maxRoot;
 
 	}
 	// --modifiers--
@@ -164,29 +165,30 @@ public class Color<Field> implements IColor<Field, Field>{
 	// --identity, equality--
 	@Override
 	public Color<Field> fork() {
-		HashMap<Field, Set<Field>> nf = new HashMap<>(families.size());
-		HashMap<Field, Set<Field>> nl = new HashMap<>(liberties.size());
-		for (Map.Entry<Field, Set<Field>> f: families.entrySet()) {
-			nf.put(f.getKey(), new HashSet<>(f.getValue()));
-		}
-		for (Map.Entry<Field, Set<Field>> l: liberties.entrySet()) {
-			nl.put(l.getKey(), new HashSet<>(l.getValue()));
-		}
+
+		HashMap<Field, Set<Field>> newFields = new HashMap<>(fields.size());
+		for (Map.Entry<Field, Set<Field>> f: fields.entrySet())
+			newFields.put(f.getKey(), new HashSet<>(f.getValue()));
+
+		HashMap<Field, Set<Field>> newAdjacents = new HashMap<>(adjacents.size());
+		for (Map.Entry<Field, Set<Field>> l: adjacents.entrySet())
+			newAdjacents.put(l.getKey(), new HashSet<>(l.getValue()));
+
 		return new Color<Field>(adjacency,
 				new HashMap<>(roots),
-				nf,
-				nl) {
+				newFields,
+				newAdjacents) {
 		};
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Color)) return false;
+		if (!(o instanceof IColor)) return false;
 
-		Color color = (Color) o;
+		IColor color = (IColor) o;
 
-		return color.roots.keySet().equals(roots.keySet());
+		return color.getFields().equals(getFields());
 	}
 
 	@Override

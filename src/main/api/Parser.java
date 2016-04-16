@@ -38,10 +38,10 @@ public class Parser<F> {
 	}
 
 	public void update(Snap result, IState<F, ?> view) {
-		result.passcounter = view.getpasscount();
-		result.currentstone = view.getcurrentstone().val;
-		result.blackpoints = view.getblackpoints();
-		result.whitepoints = view.getwhitepoints();
-		result.stones = toList(f -> view.gettable().getstone(f).val);
+		result.passcounter = view.getPassCount();
+		result.currentstone = view.getCurrentStone().val;
+		result.blackpoints = view.getBlackPoints();
+		result.whitepoints = view.getWhitePoints();
+		result.stones = toList(f -> view.getTable().getStone(f).val);
 	}
 }

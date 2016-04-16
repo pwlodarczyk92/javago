@@ -8,26 +8,26 @@ import java.util.Map;
  */
 public class CollectionUtils {
 	public static void normalize(Map<?, Double> map, Double zero, boolean center) {
-		helpnormalize(map, zero, center);
+		_normalize(map, zero, center);
 	}
-	private static <F> void helpnormalize(Map<F, Double> map, Double zero, boolean center) {
+	private static <F> void _normalize(Map<F, Double> map, Double zero, boolean center) {
 
 		if (map.isEmpty()) return;
-		Double minscore = Collections.min(map.values());
-		Double maxscore = Collections.max(map.values());
-		if (zero != null) minscore -= zero;
-		if (zero != null) maxscore -= zero;
-		Double absscore = Math.max(Math.abs(minscore), Math.abs(maxscore));
+		Double minScore = Collections.min(map.values());
+		Double maxScore = Collections.max(map.values());
+		if (zero != null) minScore -= zero;
+		if (zero != null) maxScore -= zero;
+		Double maxAbsScore = Math.max(Math.abs(minScore), Math.abs(maxScore));
 
 		for(F field: map.keySet()) {
 			Double score = map.get(field);
 			if (zero != null) score -= zero;
-			if (maxscore > minscore && center) {
-				score -= minscore;
-				score /= maxscore - minscore;
+			if (maxScore > minScore && center) {
+				score -= minScore;
+				score /= maxScore - minScore;
 				score = score * 2.0 - 1.0;
-			} else if (maxscore > minscore && !center) {
-				score /= absscore;
+			} else if (maxScore > minScore && !center) {
+				score /= maxAbsScore;
 			}
 			map.put(field, score);
 		}

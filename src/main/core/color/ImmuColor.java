@@ -29,85 +29,85 @@ public class ImmuColor<Field> extends Color<Field> {
 
 	// --modifiers--
 	@Override
-	public Field addstone(Field node) {
+	public Field addStone(Field field) {
 
-		assert !roots.containsKey(node);
+		assert !roots.containsKey(field);
 
-		Field maxroot = null;
-		int maxgroupsize = 0;
-		HashSet<Field> checkedroots = new HashSet<>();
+		Field maxRoot = null;
+		int maxGroupSize = 0;
+		HashSet<Field> traversedRoots = new HashSet<>();
 
 		// for every group adjacent to a new stone
 		// find biggest one and its root
-		// save all traversed roots to 'checkedroots'
+		// save all traversed roots to 'traversedRoots'
 
-		for (Field adjacent: adjacency.apply(node)) {
+		for (Field adjacent: adjacency.apply(field)) {
 			if (!this.contains(adjacent))
 				continue;
 
-			Field adjroot = this.roots.get(adjacent);
-			if (checkedroots.contains(adjroot))
+			Field adjacentsRoot = this.roots.get(adjacent);
+			if (traversedRoots.contains(adjacentsRoot))
 				continue;
-			checkedroots.add(adjroot);
+			traversedRoots.add(adjacentsRoot);
 
-			int nowgroupsize = families.get(adjroot).size();
-			if (maxgroupsize < nowgroupsize) {
-				maxroot = adjroot;
-				maxgroupsize = nowgroupsize;
+			int adjacentGroupSize = fields.get(adjacentsRoot).size();
+			if (maxGroupSize < adjacentGroupSize) {
+				maxRoot = adjacentsRoot;
+				maxGroupSize = adjacentGroupSize;
 			}
 		}
 
 		// no neighbors - make and return simple singleton
 
-		if (maxroot == null) {
-			Set<Field> family = ImmutableSet.of(node);
-			families.put(node, family);
-			liberties.put(node, ImmutableSet.copyOf(adjacency.apply(node)));
-			roots.put(node, node);
-			return node;
+		if (maxRoot == null) {
+			Set<Field> newFields = ImmutableSet.of(field);
+			fields.put(field, newFields);
+			adjacents.put(field, ImmutableSet.copyOf(adjacency.apply(field)));
+			roots.put(field, field);
+			return field;
 		}
 
-		// else - make one big group from neighbors and new node;
-		// create new sets of families and liberties that represent
+		// else - make one big group from neighbors and new field;
+		// create new sets of fields and adjacents that represent
 		// newly created group; set new root to biggest neighbor group's root
 
-		ImmutableSet.Builder<Field> familybuilder = ImmutableSet.builder();
-		ImmutableSet.Builder<Field> libertybuilder = ImmutableSet.builder();
+		ImmutableSet.Builder<Field> fieldsBuilder = ImmutableSet.builder();
+		ImmutableSet.Builder<Field> adjacentsBuilder = ImmutableSet.builder();
 
-		// add node (the one from args) and its liberties to new sets
+		// add field (the one from args) and its adjacents to new sets
 
-		familybuilder.add(node);
+		fieldsBuilder.add(field);
 
-		for (Field adjacent: adjacency.apply(node))
+		for (Field adjacent: adjacency.apply(field))
 			if (!this.contains(adjacent))
-				libertybuilder.add(adjacent);
+				adjacentsBuilder.add(adjacent);
 
-		// add surrounding groups' nodes and liberties to new sets, set new roots
+		// add surrounding groups' nodes and adjacents to new sets, set new roots
 
-		for (Field subroot: checkedroots) {
-			Set<Field> fam = families.remove(subroot);
-			familybuilder.addAll(fam);
-			if (subroot != maxroot)
-				for (Field n: fam)
-					roots.put(n, maxroot);
+		for (Field subRoot: traversedRoots) {
+			Set<Field> subFields = fields.remove(subRoot);
+			fieldsBuilder.addAll(subFields);
+			if (subRoot != maxRoot)
+				for (Field subField: subFields)
+					roots.put(subField, maxRoot);
 
-			Set<Field> lib = liberties.remove(subroot);
-			for (Field n: lib)
-				if (!n.equals(node))
-					libertybuilder.add(n);
+			Set<Field> subAdjacents = adjacents.remove(subRoot);
+			for (Field subAdjacent: subAdjacents)
+				if (!subAdjacent.equals(field))
+					adjacentsBuilder.add(subAdjacent);
 
 		}
 
 		// build the sets, modify object fields to represent the changes
 
-		Set<Field> newfamily = familybuilder.build();
-		Set<Field> newliberties = libertybuilder.build();
+		Set<Field> newFields = fieldsBuilder.build();
+		Set<Field> newAdjacents = adjacentsBuilder.build();
 
-		roots.put(node, maxroot);
-		families.put(maxroot, newfamily);
-		liberties.put(maxroot, newliberties);
+		roots.put(field, maxRoot);
+		fields.put(maxRoot, newFields);
+		adjacents.put(maxRoot, newAdjacents);
 
-		return maxroot;
+		return maxRoot;
 
 	}
 	// --modifiers--
@@ -116,8 +116,8 @@ public class ImmuColor<Field> extends Color<Field> {
 	public ImmuColor<Field> fork() {
 		return new ImmuColor<Field>(adjacency,
 				new HashMap<>(roots),
-				new HashMap<>(families),
-				new HashMap<>(liberties)) {
+				new HashMap<>(fields),
+				new HashMap<>(adjacents)) {
 		};
 	}
 

@@ -23,24 +23,24 @@ abstract class Core {
 
 	public Core(int size) {
 		this.fields = new Fields(size);
-		this.parser = new Parser<>(fields::field, size);
+		this.parser = new Parser<>(fields::getField, size);
 	}
 
-	public abstract Color<Integer> makecolor();
-	public Table<Integer, Integer> maketable() {
-		return new Table<>(fields.fields, fields::adjacent, makecolor(), makecolor());
+	public abstract Color<Integer> makeColor();
+	public Table<Integer, Integer> makeTable() {
+		return new Table<>(fields.fields, fields::getAdjacency, makeColor(), makeColor());
 	}
-	public Game<Integer, Integer> makegame() {
-		return new Game<>(maketable());
+	public Game<Integer, Integer> makeGame() {
+		return new Game<>(makeTable());
 	}
-	public Game<Integer, Integer> makeloggame(Function<IState<Integer, Integer>, String> statelogger, Supplier<Boolean> loggingstate) {
-		return new LogGame<>(maketable(), statelogger, loggingstate);
+	public Game<Integer, Integer> makeLogGame(Function<IState<Integer, Integer>, String> statelogger, Supplier<Boolean> loggingstate) {
+		return new LogGame<>(makeTable(), statelogger, loggingstate);
 	}
-	public GameExtView<Integer> makegameview() {
-		return new GameExtView<>(makegame(), parser, GameScore::getscores);
+	public GameExtView<Integer> makeGameView() {
+		return new GameExtView<>(makeGame(), parser, GameScore::getScore);
 	}
-	public GoAPI<GameExtView<Integer>> makeapi() {
-		return new GoAPI<>(this::makegameview);
+	public GoAPI<GameExtView<Integer>> makeGameApi() {
+		return new GoAPI<>(this::makeGameView);
 	}
 
 }

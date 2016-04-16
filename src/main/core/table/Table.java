@@ -29,16 +29,16 @@ public class Table<F, G> implements ITable<F, G> {
 
 	//--accessors--
 	@Override
-	public Collection<F> getfields() {
+	public Collection<F> getFields() {
 		return fields;
 	}
 	@Override
-	public Collection<F> adjacency(F node) {
+	public Collection<F> getAdjacency(F node) {
 		return adjacency.apply(node);
 	}
 
 	@Override
-	public ColorView<F, G> getview(Stone s) {
+	public ColorView<F, G> getView(Stone s) {
 		switch (s) {
 			case WHITE: return whites;
 			case BLACK: return blacks;
@@ -46,27 +46,27 @@ public class Table<F, G> implements ITable<F, G> {
 		}
 	}
 	@Override
-	public Stone getstone(F field) {
+	public Stone getStone(F field) {
 		if (whites.contains(field)) return Stone.WHITE;
 		if (blacks.contains(field)) return Stone.BLACK;
 		return Stone.EMPTY;
 	}
 	@Override
-	public Set<F> getlibs(Stone s, G group) {
+	public Set<F> getLiberties(Stone s, G group) {
 		switch (s) {
-			case WHITE: return _getlibsbygroup(whites, blacks, group);
-			case BLACK: return _getlibsbygroup(blacks, whites, group);
+			case WHITE: return _getLibsByGroup(whites, blacks, group);
+			case BLACK: return _getLibsByGroup(blacks, whites, group);
 			default: throw new RuntimeException();
 		}
 	}
 	//--accessors--
 
 
-	private Set<F> _getlibsbygroup(IColor<F, G> main, IColor<F, G> substract, G group) {
+	private Set<F> _getLibsByGroup(IColor<F, G> main, IColor<F, G> substract, G group) {
 
 		HashSet<F> result = new HashSet<>(4);
 
-		for (F lib: main.getadjacent(group)) {
+		for (F lib: main.getAdjacents(group)) {
 			if (!substract.contains(lib))
 				result.add(lib);
 		}
@@ -75,9 +75,9 @@ public class Table<F, G> implements ITable<F, G> {
 
 	}
 
-	private Set<F> _getlibsbyfield(IColor<F, G> main, IColor<F, G> substract, F field) {
+	private Set<F> _getLibsByField(IColor<F, G> main, IColor<F, G> substract, F field) {
 
-		return _getlibsbygroup(main, substract, main.getgroup(field));
+		return _getLibsByGroup(main, substract, main.getGroup(field));
 
 	}
 
@@ -86,33 +86,33 @@ public class Table<F, G> implements ITable<F, G> {
 	@Override
 	public Set<F> put(Stone stone, F field) {
 
-		HashSet<F> removed_stones = new HashSet<>();
+		HashSet<F> removedStones = new HashSet<>();
 		IColor<F, G> player = stone == Stone.BLACK ? blacks : whites;
 		IColor<F, G> enemy = stone == Stone.BLACK ? whites : blacks;
 
 		if (player.contains(field) || enemy.contains(field))
 			return null;
 
-		Collection<F> adjacent = adjacency.apply(field);
-		boolean moveok = false;
+		Collection<F> adjacents = adjacency.apply(field);
+		boolean isMoveOk = false;
 
-		for (F adj : adjacent) {
-			boolean playeradj = player.contains(adj);
-			boolean enemyadj = enemy.contains(adj);
+		for (F adjacent : adjacents) {
+			boolean playerAdjacent = player.contains(adjacent);
+			boolean enemyAdjacent = enemy.contains(adjacent);
 
-			if (!enemyadj && !playeradj) moveok = true;
+			if (!enemyAdjacent && !playerAdjacent) isMoveOk = true;
 
-			else if (enemyadj && _getlibsbyfield(enemy, player, adj).size()==1) {
-				moveok = true;
-				removed_stones.addAll(enemy.remgroup(enemy.getgroup(adj)));
+			else if (enemyAdjacent && _getLibsByField(enemy, player, adjacent).size()==1) {
+				isMoveOk = true;
+				removedStones.addAll(enemy.removeGroup(enemy.getGroup(adjacent)));
 			}
 
 		}
 
-		if (!moveok) {
-			for (F adj : adjacent) {
-				if (player.contains(adj) && _getlibsbyfield(player, enemy, adj).size()>1) {
-					moveok = true;
+		if (!isMoveOk) {
+			for (F adj : adjacents) {
+				if (player.contains(adj) && _getLibsByField(player, enemy, adj).size()>1) {
+					isMoveOk = true;
 					break;
 					//TODO: add tests for correctness of this check
 					//TODO: older check threw exception if getadjacent().size()==1, which is wrong
@@ -120,10 +120,10 @@ public class Table<F, G> implements ITable<F, G> {
 			}
 		}
 
-		if (!moveok) return null;
+		if (!isMoveOk) return null;
 
-		player.addstone(field);
-		return removed_stones;
+		player.addStone(field);
+		return removedStones;
 
 	}
 	//--modifiers--
@@ -132,9 +132,7 @@ public class Table<F, G> implements ITable<F, G> {
 	// --identity, equality--
 	@Override
 	public Table<F, G> fork() {
-		IColor<F, G> wc = whites.fork();
-		IColor<F, G> bc = blacks.fork();
-		return new Table<>(fields, adjacency, wc, bc);
+		return new Table<>(fields, adjacency, whites.fork(), blacks.fork());
 	}
 
 	@Override

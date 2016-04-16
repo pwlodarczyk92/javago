@@ -15,74 +15,74 @@ import java.util.Set;
 public class State<F, G> implements IState<F, G> {
 
 	protected final TableView<F, G> table;
-	protected final Stone currentstone;
-	protected final int whitepoints;
-	protected final int blackpoints;
-	protected final int passcounter;
+	protected final Stone currentStone;
+	protected final int whitePoints;
+	protected final int blackPoints;
+	protected final int passCounter;
 	protected final int hash;
 
 	protected State(TableView<F, G> table) {
 		this.table = table;
-		this.currentstone = Stone.WHITE;
-		this.whitepoints = 0;
-		this.blackpoints = 0;
-		this.passcounter = 0;
+		this.currentStone = Stone.WHITE;
+		this.whitePoints = 0;
+		this.blackPoints = 0;
+		this.passCounter = 0;
 		this.hash = _hash();
 	}
 
-	protected State(TableView<F, G> table, Integer whitepoints, Integer blackpoints, Integer passcounter, Stone currentstone) {
+	protected State(TableView<F, G> table, Integer whitePoints, Integer blackPoints, Integer passCounter, Stone currentStone) {
 		this.table = table;
-		this.whitepoints = whitepoints;
-		this.blackpoints = blackpoints;
-		this.passcounter = passcounter;
-		this.currentstone = currentstone;
+		this.whitePoints = whitePoints;
+		this.blackPoints = blackPoints;
+		this.passCounter = passCounter;
+		this.currentStone = currentStone;
 		this.hash = _hash();
 	}
 
-	private State<F,G> _passstate() {
-		return new State<>(table, whitepoints, blackpoints, passcounter+1, currentstone.opposite());
+	private State<F,G> _makePassState() {
+		return new State<>(table, whitePoints, blackPoints, passCounter +1, currentStone.opposite());
 	}
 
-	private State<F,G> _movestate(TableView<F, G> newtable, int points) {
-		switch (currentstone) {
-			case WHITE: return new State<>(newtable, whitepoints + points, blackpoints, 0, currentstone.opposite());
-			case BLACK: return new State<>(newtable, whitepoints, blackpoints + points, 0, currentstone.opposite());
+	private State<F,G> _makeMoveState(TableView<F, G> newtable, int points) {
+		switch (currentStone) {
+			case WHITE: return new State<>(newtable, whitePoints + points, blackPoints, 0, currentStone.opposite());
+			case BLACK: return new State<>(newtable, whitePoints, blackPoints + points, 0, currentStone.opposite());
 			default: throw new RuntimeException();
 		}
 	}
 
 	private int _hash() {
 		int result = table.hashCode();
-		result = 31 * result + currentstone.hashCode();
-		result = 31 * result + whitepoints;
-		result = 31 * result + blackpoints;
-		result = 31 * result + passcounter;
+		result = 31 * result + currentStone.hashCode();
+		result = 31 * result + whitePoints;
+		result = 31 * result + blackPoints;
+		result = 31 * result + passCounter;
 		return result;
 	}
 
 	// --accessors--
 	@Override
-	public Integer getpasscount() {
-		return passcounter;
+	public Integer getPassCount() {
+		return passCounter;
 	}
 
 	@Override
-	public Integer getwhitepoints() {
-		return whitepoints;
+	public Integer getWhitePoints() {
+		return whitePoints;
 	}
 
 	@Override
-	public Integer getblackpoints() {
-		return blackpoints;
+	public Integer getBlackPoints() {
+		return blackPoints;
 	}
 
 	@Override
-	public Stone getcurrentstone() {
-		return currentstone;
+	public Stone getCurrentStone() {
+		return currentStone;
 	}
 
 	@Override
-	public TableView<F, G> gettable() {
+	public TableView<F, G> getTable() {
 		return table;
 	}
 	//--accessors--
@@ -91,15 +91,15 @@ public class State<F, G> implements IState<F, G> {
 	@Override
 	public Map.Entry<Set<F>, State<F, G>> put(F field) {
 
-		if (passcounter > 1) return null;
-		if (field == null) return new AbstractMap.SimpleEntry<>(Collections.emptySet(), _passstate());
+		if (passCounter > 1) return null;
+		if (field == null) return new AbstractMap.SimpleEntry<>(Collections.emptySet(), _makePassState());
 		else {
 
-			ITable<F, G> newtable = table.fork();
-			Set<F> points = newtable.put(currentstone, field);
+			ITable<F, G> newTable = table.fork();
+			Set<F> points = newTable.put(currentStone, field);
 
 			if (points == null) return null;
-			return new AbstractMap.SimpleEntry<>(points, _movestate(newtable, points.size()));
+			return new AbstractMap.SimpleEntry<>(points, _makeMoveState(newTable, points.size()));
 		}
 
 	}
@@ -108,7 +108,7 @@ public class State<F, G> implements IState<F, G> {
 
 	@Override
 	public State<F, G> fork() {
-		return new State<>(table.fork(), whitepoints, blackpoints, passcounter, currentstone);
+		return new State<>(table.fork(), whitePoints, blackPoints, passCounter, currentStone);
 	}
 
 	@Override
@@ -118,10 +118,10 @@ public class State<F, G> implements IState<F, G> {
 
 		State that = (State) o;
 
-		if (currentstone != that.currentstone) return false;
-		if (blackpoints != that.blackpoints) return false;
-		if (passcounter != that.passcounter) return false;
-		if (whitepoints != that.whitepoints) return false;
+		if (currentStone != that.currentStone) return false;
+		if (blackPoints != that.blackPoints) return false;
+		if (passCounter != that.passCounter) return false;
+		if (whitePoints != that.whitePoints) return false;
 		if (!table.equals(that.table)) return false;
 
 		return true;

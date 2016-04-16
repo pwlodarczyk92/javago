@@ -13,33 +13,33 @@ import java.util.Set;
  */
 public interface TableView<F, G> extends Forkable<ITable<F, G>> {
 
-	public Collection<F> getfields();
-	public Collection<F> adjacency(F node);
+	public Collection<F> getFields();
+	public Collection<F> getAdjacency(F node);
 
-	public ColorView<F, G> getview(Stone s);
-	public Stone getstone(F field);
-	public Set<F> getlibs(Stone s, G group);
+	public ColorView<F, G> getView(Stone s);
+	public Stone getStone(F field);
+	public Set<F> getLiberties(Stone s, G group);
 
-	public default Set<F> getalllibs() {
+	public default Set<F> getAllLiberties() {
 		Set<F> result = new HashSet<>();
-		getview(Stone.WHITE).getallgroups().stream().forEach(g -> result.addAll(getlibs(Stone.WHITE, g)));
-		getview(Stone.BLACK).getallgroups().stream().forEach(g -> result.addAll(getlibs(Stone.BLACK, g)));
+		getView(Stone.WHITE).getGroups().stream().forEach(g -> result.addAll(getLiberties(Stone.WHITE, g)));
+		getView(Stone.BLACK).getGroups().stream().forEach(g -> result.addAll(getLiberties(Stone.BLACK, g)));
 		return result;
 	}
 
-	public default Set<F> getmoorelibs() {
+	public default Set<F> getMooreLiberties() {
 		Set<F> result = new HashSet<>();
-		Set<F> empty = new HashSet<>();
-		Set<F> libs = getalllibs();
+		Set<F> emptyAdjacents = new HashSet<>();
+		Set<F> liberties = getAllLiberties();
 
-		for(F f: libs) {
-			for (F field : adjacency(f)) {
-				if (getstone(field) != Stone.EMPTY) continue;
-				if (!empty.contains(field)) empty.add(field);
-				else result.add(field);
+		for(F l: liberties) {
+			for (F a : getAdjacency(l)) {
+				if (getStone(a) != Stone.EMPTY) continue;
+				if (!emptyAdjacents.contains(a)) emptyAdjacents.add(a);
+				else result.add(a);
 			}
 		}
-		result.addAll(libs);
+		result.addAll(liberties);
 
 		return result;
 	}

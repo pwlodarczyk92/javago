@@ -12,11 +12,11 @@ import java.util.Set;
  */
 public interface IState<F, G> extends Forkable<IState<F, G>> {
 
-	public Integer getpasscount();
-	public Integer getwhitepoints();
-	public Integer getblackpoints();
-	public Stone getcurrentstone();
-	public TableView<F, G> gettable();
+	public Integer getPassCount();
+	public Integer getWhitePoints();
+	public Integer getBlackPoints();
+	public Stone getCurrentStone();
+	public TableView<F, G> getTable();
 
 	public Map.Entry<? extends Set<F>, ? extends IState<F, G>> put(F field);
 

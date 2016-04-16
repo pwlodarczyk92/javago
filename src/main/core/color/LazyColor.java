@@ -13,18 +13,18 @@ import java.util.function.Function;
  * Concurrent modification can cause inconsistent results
  * just like with regular Color instances.
  * Locks are used to make modification of different LazyColor instances containing
- * common (lazily copied) 'roots', 'families' and 'liberties' references - threadsafe.
+ * common (lazily copied) 'roots', 'fields' and 'adjacents' references - threadsafe.
  */
 
 public class LazyColor<Field> extends Color<Field>{
 
 	//--lazy ref count and lock--
-	private static class Refwatch {
+	private static class ReferenceWatch {
 		private int count = 1;
-		private Lock copylock = new ReentrantLock();
+		private Lock lock = new ReentrantLock();
 	}
 
-	private Refwatch refwatch;
+	private ReferenceWatch watch;
 	//--lazy ref count and lock--
 
 	public LazyColor(Function<Field, Collection<Field>> adjacency) {
@@ -32,58 +32,60 @@ public class LazyColor<Field> extends Color<Field>{
 				new HashMap<>(),
 				new HashMap<>(),
 				new HashMap<>(),
-				new Refwatch());
+				new ReferenceWatch());
 	}
 
 	protected LazyColor(Function<Field, Collection<Field>> adjacency,
 						HashMap<Field, Field> roots,
 						HashMap<Field, Set<Field>> families,
 						HashMap<Field, Set<Field>> liberties,
-						Refwatch refwatch) {
+						ReferenceWatch watch) {
 		super(adjacency, roots, families, liberties);
-		this.refwatch = refwatch;
+		this.watch = watch;
 	}
 
-	private void substitute() {
+	private void replicate() {
 
-		Refwatch newwatch = new Refwatch();
-		newwatch.copylock.lock();
-		Refwatch oldwatch = refwatch;
-		refwatch = newwatch;
+		ReferenceWatch newWatch = new ReferenceWatch();
+		newWatch.lock.lock();
+		ReferenceWatch oldWatch = watch;
+		watch = newWatch;
 
 		this.roots = new HashMap<>(this.roots);
-		HashMap<Field, Set<Field>> nf = new HashMap<>(families.size());
-		for (Map.Entry<Field, Set<Field>> f : families.entrySet())
-			nf.put(f.getKey(), new HashSet<>(f.getValue()));
-		this.families = nf;
-		HashMap<Field, Set<Field>> nl = new HashMap<>(liberties.size());
-		for (Map.Entry<Field, Set<Field>> l : liberties.entrySet())
-			nl.put(l.getKey(), new HashSet<>(l.getValue()));
-		this.liberties = nl;
 
-		oldwatch.count -= 1;
-		oldwatch.copylock.unlock();
+		HashMap<Field, Set<Field>> newFields = new HashMap<>(fields.size());
+		for (Map.Entry<Field, Set<Field>> f : fields.entrySet())
+			newFields.put(f.getKey(), new HashSet<>(f.getValue()));
+		this.fields = newFields;
+
+		HashMap<Field, Set<Field>> newAdjacents = new HashMap<>(adjacents.size());
+		for (Map.Entry<Field, Set<Field>> a : adjacents.entrySet())
+			newAdjacents.put(a.getKey(), new HashSet<>(a.getValue()));
+		this.adjacents = newAdjacents;
+
+		oldWatch.count -= 1;
+		oldWatch.lock.unlock();
 
 	}
 
 	@Override
-	public Set<Field> remgroup(Field root) {
+	public Set<Field> removeGroup(Field root) {
 
-		refwatch.copylock.lock();
-		if (refwatch.count > 1) substitute();
-		Set<Field> result = super.remgroup(root);
-		refwatch.copylock.unlock();
+		watch.lock.lock();
+		if (watch.count > 1) replicate();
+		Set<Field> result = super.removeGroup(root);
+		watch.lock.unlock();
 
 		return result;
 	}
 
 	@Override
-	public Field addstone(Field node) {
+	public Field addStone(Field field) {
 
-		refwatch.copylock.lock();
-		if (refwatch.count > 1) substitute();
-		Field result = super.addstone(node);
-		refwatch.copylock.unlock();
+		watch.lock.lock();
+		if (watch.count > 1) replicate();
+		Field result = super.addStone(field);
+		watch.lock.unlock();
 
 		return result;
 	}
@@ -91,10 +93,10 @@ public class LazyColor<Field> extends Color<Field>{
 	@Override
 	public LazyColor<Field> fork() {
 
-		refwatch.copylock.lock();
-		refwatch.count += 1;
-		LazyColor<Field> result = new LazyColor<>(adjacency, roots, families, liberties, refwatch);
-		refwatch.copylock.unlock();
+		watch.lock.lock();
+		watch.count += 1;
+		LazyColor<Field> result = new LazyColor<>(adjacency, roots, fields, adjacents, watch);
+		watch.lock.unlock();
 
 		return result;
 	}

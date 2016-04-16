@@ -11,8 +11,8 @@ public class StandardCore extends Core {
 	}
 
 	@Override
-	public Color<Integer> makecolor() {
-		return new Color<>(fields::adjacent);
+	public Color<Integer> makeColor() {
+		return new Color<>(fields::getAdjacency);
 	}
 
 }

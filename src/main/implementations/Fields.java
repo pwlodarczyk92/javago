@@ -12,11 +12,11 @@ import java.util.List;
 public class Fields {
 
 	public final int size;
-	private final HashBasedTable<Integer, Integer, Integer> fieldscache = HashBasedTable.create();
+	private final HashBasedTable<Integer, Integer, Integer> fieldsCache = HashBasedTable.create();
 
 	public final List<Integer> fields;
-	public final List<Integer> xvals;
-	public final List<Integer> yvals;
+	public final List<Integer> xValues;
+	public final List<Integer> yValues;
 	public final List<List<Integer>> adjacents;
 
 	private void init(List<Integer> fields, List<Integer> xvals, List<Integer> yvals, List<List<Integer>> adjacents) {
@@ -25,10 +25,10 @@ public class Fields {
 		for (int x = 0; x < size; x++) {
 			for (int y = 0; y < size; y++) {
 
-				fields.add(calcfield(x, y));
+				fields.add(_field(x, y));
 				xvals.add(x);
 				yvals.add(y);
-				fieldscache.put(x, y, calcfield(x, y));
+				fieldsCache.put(x, y, _field(x, y));
 
 				ArrayList<Integer> adjs = new ArrayList<>();
 				for(int l=0; l<4; l++) {
@@ -36,7 +36,7 @@ public class Fields {
 					int ya = y+ydifs[l];
 
 					if (0 <= xa && xa < size && 0 <= ya && ya < size)
-						adjs.add(calcfield(xa, ya));
+						adjs.add(_field(xa, ya));
 				}
 				adjacents.add(Collections.unmodifiableList(adjs));
 			}
@@ -52,26 +52,25 @@ public class Fields {
 		List<List<Integer>> adjtemp = new ArrayList<>();
 		init(ftemp, xtemp, ytemp, adjtemp);
 		this.fields = Collections.unmodifiableList(ftemp);
-		this.xvals = Collections.unmodifiableList(xtemp);
-		this.yvals = Collections.unmodifiableList(ytemp);
+		this.xValues = Collections.unmodifiableList(xtemp);
+		this.yValues = Collections.unmodifiableList(ytemp);
 		this.adjacents = Collections.unmodifiableList(adjtemp);
 
 	}
 
-	public List<Integer> adjacent(Integer field) {
+	public List<Integer> getAdjacency(Integer field) {
 		return adjacents.get(field);
 	}
-	private Integer calcfield(int x, int y) {
+	private Integer _field(int x, int y) {
 		return x*size+y;
 	}
-
-	public Integer field(int x, int y) {
-		return fieldscache.get(x, y);
+	public Integer getField(int x, int y) {
+		return fieldsCache.get(x, y);
 	}
-	public int x(Integer f) {
-		return xvals.get(f);
+	public int getX(Integer f) {
+		return xValues.get(f);
 	}
-	public int y(Integer f) {
-		return yvals.get(f);
+	public int getY(Integer f) {
+		return yValues.get(f);
 	}
 }

@@ -7,7 +7,7 @@ import java.util.Set;
  */
 public interface IColor<F, G> extends ColorView<F, G> {
 
-	public Set<F> remgroup(G group);
-	public G addstone(F node);
+	public Set<F> removeGroup(G group);
+	public G addStone(F node);
 
 }

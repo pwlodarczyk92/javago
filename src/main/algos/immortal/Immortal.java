@@ -25,11 +25,11 @@ public class Immortal {
 	}
 
 	private static class KillGroup<F> {
-		Set<F> nodes;
-		Set<F> libs;
-		private KillGroup(Set<F> nodes, Set<F> libs) {
-			this.nodes = nodes;
-			this.libs = libs;
+		Set<F> fields;
+		Set<F> liberties;
+		private KillGroup(Set<F> fields, Set<F> liberties) {
+			this.fields = fields;
+			this.liberties = liberties;
 		}
 	}
 
@@ -42,51 +42,51 @@ public class Immortal {
 
 	// killgrouplibs returns list of killgroups and their liberties for given group that is to be killed
 
-	private static <F, G> List<KillGroup<F>> killgrouplibs(ColorView<F, G> colorview, G group) {
+	private static <F, G> List<KillGroup<F>> _getKillGroups(ColorView<F, G> colorView, G group) {
 
-		Set<F> grouplibs = colorview.getadjacent(group);
-		Set<F> groupnodes = colorview.getstones(group);
+		Set<F> liberties = colorView.getAdjacents(group);
+		Set<F> fields = colorView.getFields(group);
 
-		Set<F> leftlibs = new HashSet<>(grouplibs);
-		List<KillGroup<F>> kglibs = new ArrayList<>();
+		Set<F> leftLiberties = new HashSet<>(liberties);
+		List<KillGroup<F>> killGroups = new ArrayList<>();
 
-		while (!leftlibs.isEmpty()) {
+		while (!leftLiberties.isEmpty()) {
 
-			F seed = leftlibs.iterator().next();
+			F seed = leftLiberties.iterator().next();
 
-			Set<F> killfront = new HashSet<>();
-			Set<F> killgroup = new HashSet<>();
-			killfront.add(seed);
-			killgroup.add(seed);
+			Set<F> killGroupFrontier = new HashSet<>();
+			Set<F> killGroupFields = new HashSet<>();
+			killGroupFrontier.add(seed);
+			killGroupFields.add(seed);
 
-			Set<F> killlibs = new HashSet<>();
-			kglibs.add(new KillGroup<>(killgroup, killlibs));
+			Set<F> killGroupLiberties = new HashSet<>();
+			killGroups.add(new KillGroup<>(killGroupFields, killGroupLiberties));
 
-			while(!killfront.isEmpty()) { // disjoint-set traversal
+			while(!killGroupFrontier.isEmpty()) { // disjoint-set traversal
 
-				F killfield = killfront.iterator().next();
-				killfront.remove(killfield);
-				leftlibs.remove(killfield);
+				F killField = killGroupFrontier.iterator().next();
+				killGroupFrontier.remove(killField);
+				leftLiberties.remove(killField);
 
-				for (F killadj : colorview.adjacency(killfield)) {
+				for (F killFieldAdjacent : colorView.getAdjacency(killField)) {
 
-					if (killgroup.contains(killadj)) // node already traversed
+					if (killGroupFields.contains(killFieldAdjacent)) // node already traversed
 						continue;
 
-					if (!grouplibs.contains(killadj)) { // node not adjacent to group
-						if (!groupnodes.contains(killadj)) // node 2 fields away from group - killgroup liberty
-							killlibs.add(killadj);
+					if (!liberties.contains(killFieldAdjacent)) { // node not adjacent to group
+						if (!fields.contains(killFieldAdjacent)) // node 2 fields away from group - killgroup liberty
+							killGroupLiberties.add(killFieldAdjacent);
 						continue;
 					}
 
-					killgroup.add(killadj);
-					killfront.add(killadj);
+					killGroupFields.add(killFieldAdjacent);
+					killGroupFrontier.add(killFieldAdjacent);
 				}
 			}
 
 		}
 
-		return kglibs;
+		return killGroups;
 
 	}
 
@@ -94,69 +94,69 @@ public class Immortal {
 	// by other groups that are supposed to be immortal.
 	// if more than one kill group is blocked this way, there is no way to kill the group
 
-	private static <F, G> List<KillGroup<F>> deadkillgrouplibs(List<KillGroup<F>> killgrouplibs, ColorView<F, G> colorview, Predicate<G> notimmo) {
+	private static <F, G> List<KillGroup<F>> _deadKillGroups(List<KillGroup<F>> killGroups, ColorView<F, G> colorView, Predicate<G> isNotImmortal) {
 
-		List<KillGroup<F>> dkgs = new ArrayList<>(killgrouplibs);
+		List<KillGroup<F>> result = new ArrayList<>(killGroups);
 
-		for (Iterator<KillGroup<F>> killgroupiter = dkgs.iterator(); killgroupiter.hasNext();) {
-			KillGroup<F> kg = killgroupiter.next();
-			Set<F> libs = kg.libs;
+		for (Iterator<KillGroup<F>> killGroupIterator = result.iterator(); killGroupIterator.hasNext();) {
+			KillGroup<F> killGroup = killGroupIterator.next();
+			Set<F> liberties = killGroup.liberties;
 
-			for (F lib: libs) {
-				if (!colorview.contains(lib)) {
-					killgroupiter.remove();
+			for (F liberty: liberties) {
+				if (!colorView.contains(liberty)) {
+					killGroupIterator.remove();
 					break;
 				}
-				G savinggroup = colorview.getgroup(lib);
-				if (notimmo.test(savinggroup)) {
-					killgroupiter.remove();
+				G savingGroup = colorView.getGroup(liberty);
+				if (isNotImmortal.test(savingGroup)) {
+					killGroupIterator.remove();
 					break;
 				}
 			}
 		}
 
-		return dkgs;
+		return result;
 
 	}
 
 	//returns set of immortal groups of given color
 
-	public static <F, G> Result<F, G> get(ColorView<F, G> colorview) {
+	public static <F, G> Result<F, G> get(ColorView<F, G> colorView) {
 
-		Set<G> groups = colorview.getallgroups();
+		Set<G> groups = colorView.getGroups();
 
-		HashMap<G, List<KillGroup<F>>> kglibs = new HashMap<>();
+		HashMap<G, List<KillGroup<F>>> killGroups = new HashMap<>();
 		for(G group: groups)
-			kglibs.put(group, killgrouplibs(colorview, group));
+			killGroups.put(group, _getKillGroups(colorView, group));
 
-		Set<G> unchecked = new HashSet<>(groups);
-		Set<G> probablyimmo = new HashSet<>();
+		Set<G> uncheckedGroups = new HashSet<>(groups);
+		Set<G> probablyImmortalGroups = new HashSet<>();
 		List<Set<F>> points = new ArrayList<>();
-		Predicate<G> notimmo = group -> !unchecked.contains(group) && !probablyimmo.contains(group);
+		Predicate<G> isNotImmortal = group -> !uncheckedGroups.contains(group) && !probablyImmortalGroups.contains(group);
 
-		while (!unchecked.isEmpty()) {
+		while (!uncheckedGroups.isEmpty()) {
 
-			G group = unchecked.iterator().next();
-			unchecked.remove(group);
+			G group = uncheckedGroups.iterator().next();
+			uncheckedGroups.remove(group);
 
-			List<KillGroup<F>> deadkgs = deadkillgrouplibs(kglibs.get(group), colorview, notimmo);
+			List<KillGroup<F>> deadKillGroups = _deadKillGroups(killGroups.get(group), colorView, isNotImmortal);
 
-			if (deadkgs.size()>1) {
+			if (deadKillGroups.size()>1) {
 
-				probablyimmo.add(group);
-				deadkgs.forEach(kg -> points.add(kg.nodes));
+				probablyImmortalGroups.add(group);
+				deadKillGroups.forEach(killGroup -> points.add(killGroup.fields));
 
 			} else {
 
-				unchecked.addAll(probablyimmo);
-				probablyimmo.clear();
+				uncheckedGroups.addAll(probablyImmortalGroups);
+				probablyImmortalGroups.clear();
 				points.clear();
 
 			}
 
 		}
 
-		return new Result<>(probablyimmo, points);
+		return new Result<>(probablyImmortalGroups, points);
 
 	}
 }

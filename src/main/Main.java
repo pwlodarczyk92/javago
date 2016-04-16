@@ -13,8 +13,8 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		Properties props = new Properties();
-		String input = Resources.toString(Resources.getResource("server.config"), Charsets.UTF_8);
-		props.load(new StringReader(input));
+		String rawConfig = Resources.toString(Resources.getResource("server.config"), Charsets.UTF_8);
+		props.load(new StringReader(rawConfig));
 
 		Server.Config config = new Server.Config();
 		config.port = Integer.parseInt(props.getProperty("PORT"));

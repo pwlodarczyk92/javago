@@ -15,23 +15,23 @@ public class AdjExpander {
 	public static <F, G> Set<Node<F, IState<F, G>>> expand(TreeGame<F, G> tree, Node<F, IState<F, G>> node) {
 
 		Set<Node<F, IState<F, G>>> result = new HashSet<>();
-		for (F field: node.state.gettable().getmoorelibs()) {
-			Node<F, IState<F, G>> newnode = tree.moveto(node, field);
-			if (newnode != null) result.add(newnode);
+		for (F field: node.state.getTable().getMooreLiberties()) {
+			Node<F, IState<F, G>> newNode = tree.makeMove(node, field);
+			if (newNode != null) result.add(newNode);
 		}
 		return result;
 
 	}
 
-	public static <F, G> void expandbulk(TreeGame<F, G> tree, Node<F, IState<F, G>> root, int iter) {
+	public static <F, G> void expandbulk(TreeGame<F, G> tree, Node<F, IState<F, G>> root, int iterations) {
 		HashSet<Node<F, IState<F, G>>> nodes = new HashSet<>();
 		nodes.add(root);
-		while(iter>=1) {
-			iter -= 1;
-			HashSet<Node<F, IState<F, G>>> newnodes = new HashSet<>();
+		while(iterations>=1) {
+			iterations -= 1;
+			HashSet<Node<F, IState<F, G>>> newNodes = new HashSet<>();
 			for (Node<F, IState<F, G>> node: nodes)
-				newnodes.addAll(expand(tree, node));
-			nodes = newnodes;
+				newNodes.addAll(expand(tree, node));
+			nodes = newNodes;
 		}
 	}
 }

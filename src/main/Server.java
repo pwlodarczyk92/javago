@@ -27,7 +27,7 @@ public class Server {
 	}
 
 	final private Logger logger = LoggerFactory.getLogger(this.getClass());
-	private GoAPI api = new ImmuLazyCore(19).makeapi();
+	private GoAPI api = new ImmuLazyCore(19).makeGameApi();
 	private Config config = new Config();
 	private boolean running = false;
 

@@ -12,8 +12,8 @@ public class ImmuCore extends Core {
 	}
 
 	@Override
-	public ImmuColor<Integer> makecolor() {
-		return new ImmuColor<>(fields::adjacent);
+	public ImmuColor<Integer> makeColor() {
+		return new ImmuColor<>(fields::getAdjacency);
 	}
 
 }

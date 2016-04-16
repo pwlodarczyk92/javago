@@ -16,19 +16,19 @@ public class ScoreExpander {
 
 		HashMap<F, Double> result = new HashMap<>();
 
-		Node<F, IState<F, G>> zeronode = tb.moveto(tb.root, null);
+		Node<F, IState<F, G>> zeronode = tb.makeMove(tb.root, null);
 		if (zeronode!=null) expander.accept(tb, zeronode);
 		else return new HashMap<>();
 
-		for(F field : tb.root.state.gettable().getmoorelibs()) {
-			Node<F, IState<F, G>> movenode = tb.moveto(tb.root, field);
+		for(F field : tb.root.state.getTable().getMooreLiberties()) {
+			Node<F, IState<F, G>> movenode = tb.makeMove(tb.root, field);
 			if (movenode!=null) expander.accept(tb, movenode);
 		}
 
-		result.put(null, zeronode.score());
-		for (F field : tb.root.state.gettable().getmoorelibs()) {
-			Node<F, IState<F, G>> movenode = tb.moveto(tb.root, field);
-			if (movenode != null) result.put(field, movenode.score());
+		result.put(null, zeronode.getScore());
+		for (F field : tb.root.state.getTable().getMooreLiberties()) {
+			Node<F, IState<F, G>> movenode = tb.makeMove(tb.root, field);
+			if (movenode != null) result.put(field, movenode.getScore());
 		}
 
 		return result;

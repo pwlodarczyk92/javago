@@ -15,56 +15,56 @@ public class Node<F, S>{
 	final static protected Logger logger = LoggerFactory.getLogger(TreeGame.class.getName());
 
 	public final S state;
-	public final boolean white;
+	public final boolean isWhite;
 
-	public final F lastmove;
+	public final F lastMove;
 	public final Node<F, S> predecessor;
 	protected final HashMap<F, Node<F, S>> successors;
 
-	public final double rawscore;
-	protected double treescore;
+	public final double rawScore;
+	protected double treeScore;
 
-	public double score () {
-		if (!isNaN(treescore)) return treescore;
-		else return rawscore;
+	public double getScore() {
+		if (!isNaN(treeScore)) return treeScore;
+		else return rawScore;
 	}
 
-	public Node<F, S> expand(S state, F move, double rawscore) {
-		Node<F, S> newnode = new Node<>(state, rawscore, this, move, !white);
-		successors.put(move, newnode);
+	public Node<F, S> expand(S state, F move, double rawScore) {
+		Node<F, S> newNode = new Node<>(state, rawScore, this, move, !isWhite);
+		successors.put(move, newNode);
 		updateScore();
-		return newnode;
+		return newNode;
 	}
 
-	public void setinvalid(F move) {
+	public void setInvalid(F move) {
 		successors.put(move, null);
 	}
 
 	private void updateScore() {
 
-		double oldscore = treescore;
-		if(white) this.treescore = successors.values().stream().filter(i->i!=null).mapToDouble(Node::score).max().getAsDouble();
-		else this.treescore = successors.values().stream().filter(i->i!=null).mapToDouble(Node::score).min().getAsDouble();
-		if (predecessor != null && (isNaN(oldscore) || oldscore != treescore)) predecessor.updateScore();
+		double oldscore = treeScore;
+		if(isWhite) this.treeScore = successors.values().stream().filter(i->i!=null).mapToDouble(Node::getScore).max().getAsDouble();
+		else this.treeScore = successors.values().stream().filter(i->i!=null).mapToDouble(Node::getScore).min().getAsDouble();
+		if (predecessor != null && (isNaN(oldscore) || oldscore != treeScore)) predecessor.updateScore();
 
 	}
 
-	public Node(S state, double rawscore, Node<F, S> predecessor, F move, boolean white) {
+	public Node(S state, double rawScore, Node<F, S> predecessor, F move, boolean isWhite) {
 
 		this.state = state;
-		this.white = white;
+		this.isWhite = isWhite;
 
 		this.predecessor = predecessor;
-		this.lastmove = move;
+		this.lastMove = move;
 		this.successors = new HashMap<>();
 
-		this.rawscore = rawscore;
-		this.treescore = Double.NaN;
+		this.rawScore = rawScore;
+		this.treeScore = Double.NaN;
 	}
 
 
-	public Node(S state, double score, boolean white) {
-		this(state, score, null, null, white);
+	public Node(S state, double score, boolean isWhite) {
+		this(state, score, null, null, isWhite);
 	}
 
 }

@@ -12,8 +12,8 @@ public interface ExtView {
 
 	public void undo();
 
-	public Snap getview();
+	public Snap getView();
 
-	public Snap getview(Score score);
+	public Snap getView(Score score);
 
 }

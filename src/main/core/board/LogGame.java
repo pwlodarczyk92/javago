@@ -11,34 +11,34 @@ import java.util.function.Supplier;
  */
 public class LogGame<F, G> extends Game<F, G> {
 
-	private final Function<IState<F, G>, String> statelogger;
-	private final Supplier<Boolean> islogging;
+	private final Function<IState<F, G>, String> stateLogger;
+	private final Supplier<Boolean> isLogging;
 
-	public LogGame(Table<F, G> table, Function<IState<F, G>, String> statelogger, Supplier<Boolean> islogging) {
+	public LogGame(Table<F, G> table, Function<IState<F, G>, String> stateLogger, Supplier<Boolean> isLogging) {
 		super(table);
-		this.statelogger = statelogger;
-		this.islogging = islogging;
+		this.stateLogger = stateLogger;
+		this.isLogging = isLogging;
 	}
 
 	protected LogGame(LogGame<F, G> logBoard) {
-		super(logBoard.currentstate, logBoard.states, logBoard.moves, logBoard.tables);
-		this.statelogger = logBoard.statelogger;
-		this.islogging = logBoard.islogging;
+		super(logBoard.currentState, logBoard.states, logBoard.moves, logBoard.tables);
+		this.stateLogger = logBoard.stateLogger;
+		this.isLogging = logBoard.isLogging;
 	}
 
 	@Override
 	public Set<F> put(F field) {
 		Set<F> result = super.put(field);
-		if (this.islogging.get() && result != null)
-			logger.warn(statelogger.apply(currentstate));
+		if (this.isLogging.get() && result != null)
+			logger.warn(stateLogger.apply(currentState));
 		return result;
 	}
 
 	@Override
 	public F undo() {
 		F result = super.undo();
-		if (this.islogging.get())
-			logger.warn(statelogger.apply(currentstate));
+		if (this.isLogging.get())
+			logger.warn(stateLogger.apply(currentState));
 		return result;
 	}
 

@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class GameScore {
 
-	public static <F> Map<F, Double> getscores(Score score, IGame<F, ?> game) {
+	public static <F> Map<F, Double> getScore(Score score, IGame<F, ?> game) {
 
 		try {
 			switch (score) {

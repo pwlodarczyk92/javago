@@ -25,44 +25,44 @@ public abstract class TableTest {
 		}
 	}
 
-	private Function<Integer, Collection<Integer>> adj = new LinAdj();
+	private Function<Integer, Collection<Integer>> adjacency = new LinAdj();
 
 	protected abstract ITable<Integer, ?> createInstance(Collection<Integer> fields, Function<Integer, Collection<Integer>> adjacency, Color<Integer> whites, Color<Integer> blacks);
 
 	@org.junit.Test
 	public final void simpleTest() {
 		List<Integer> range = ContiguousSet.create(Range.closed(-20, 20), DiscreteDomain.integers()).asList();
-		ITable<Integer, ?> table = createInstance(range, adj, new Color<>(adj), new Color<>(adj));
-		ColorView<Integer, ?> w = table.getview(Stone.WHITE);
-		ColorView<Integer, ?> b = table.getview(Stone.BLACK);
+		ITable<Integer, ?> table = createInstance(range, adjacency, new Color<>(adjacency), new Color<>(adjacency));
+		ColorView<Integer, ?> whites = table.getView(Stone.WHITE);
+		ColorView<Integer, ?> blacks = table.getView(Stone.BLACK);
 
 		assert null != table.put(Stone.WHITE, 1);
-		assert w.getallstones().equals(mkset(1));
-		assert b.getallstones().equals(mkset());
+		assert whites.getFields().equals(_makeSet(1));
+		assert blacks.getFields().equals(_makeSet());
 
 		assert null != table.put(Stone.WHITE, 2);
-		assert w.getallstones().equals(mkset(1, 2));
-		assert b.getallstones().equals(mkset());
+		assert whites.getFields().equals(_makeSet(1, 2));
+		assert blacks.getFields().equals(_makeSet());
 
 		assert null != table.put(Stone.BLACK, 0);
-		assert w.getallstones().equals(mkset(1, 2));
-		assert b.getallstones().equals(mkset(0));
+		assert whites.getFields().equals(_makeSet(1, 2));
+		assert blacks.getFields().equals(_makeSet(0));
 
 		assert null != table.put(Stone.BLACK, 3);
-		assert w.getallstones().equals(mkset());
-		assert b.getallstones().equals(mkset(0, 3));
+		assert whites.getFields().equals(_makeSet());
+		assert blacks.getFields().equals(_makeSet(0, 3));
 
 		assert null != table.put(Stone.WHITE, 2);
-		assert w.getallstones().equals(mkset(2));
-		assert b.getallstones().equals(mkset(0, 3));
+		assert whites.getFields().equals(_makeSet(2));
+		assert blacks.getFields().equals(_makeSet(0, 3));
 
 		assert null != table.put(Stone.WHITE, 4);
-		assert w.getallstones().equals(mkset(2, 4));
-		assert b.getallstones().equals(mkset(0));
+		assert whites.getFields().equals(_makeSet(2, 4));
+		assert blacks.getFields().equals(_makeSet(0));
 	}
 
 	@SafeVarargs
-	private final <F> HashSet<F> mkset(F... elems) {
+	private final <F> HashSet<F> _makeSet(F... elems) {
 		return new HashSet<>(Arrays.asList(elems));
 	}
 

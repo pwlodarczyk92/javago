@@ -11,8 +11,8 @@ public class LazyCore extends Core {
 	}
 
 	@Override
-	public LazyColor<Integer> makecolor() {
-		return new LazyColor<>(fields::adjacent);
+	public LazyColor<Integer> makeColor() {
+		return new LazyColor<>(fields::getAdjacency);
 	}
 
 }

@@ -14,21 +14,21 @@ public class Game<F, G> implements IGame<F, G> {
 
 	final protected Logger logger = LoggerFactory.getLogger(Game.class.getName());
 
-	protected State<F, G> currentstate;
+	protected State<F, G> currentState;
 	protected final LinkedList<State<F, G>> states;
 	protected final LinkedList<F> moves;
 	protected final HashSet<TableView<F, G>> tables;
 
 	public Game(TableView<F, G> table) {
-		this.currentstate = new State<>(table);
+		this.currentState = new State<>(table);
 		this.states = new LinkedList<>();
 		this.moves = new LinkedList<>();
 		this.tables = new HashSet<>();
-		this.states.addLast(this.currentstate);
+		this.states.addLast(this.currentState);
 	}
 
-	protected Game(State<F, G> currentstate, LinkedList<State<F, G>> states, LinkedList<F> moves, HashSet<TableView<F, G>> tables) {
-		this.currentstate = currentstate;
+	protected Game(State<F, G> currentState, LinkedList<State<F, G>> states, LinkedList<F> moves, HashSet<TableView<F, G>> tables) {
+		this.currentState = currentState;
 		this.states = new LinkedList<>(states);
 		this.moves = new LinkedList<>(moves);
 		this.tables = new HashSet<>(tables);
@@ -36,16 +36,16 @@ public class Game<F, G> implements IGame<F, G> {
 
 	//--accessors--
 	@Override
-	public boolean superkoviolation(IState<F, G> state) {
-		return tables.contains(state.gettable());
+	public boolean isKoViolatedBy(IState<F, G> state) {
+		return tables.contains(state.getTable());
 	}
 	@Override
-	public List<F> moves() {
+	public List<F> getMoves() {
 		return Collections.unmodifiableList(moves);
 	}
 	@Override
-	public State<F, G> getstate() {
-		return currentstate;
+	public State<F, G> getState() {
+		return currentState;
 	}
 	//--accessors--
 
@@ -54,18 +54,18 @@ public class Game<F, G> implements IGame<F, G> {
 	@Override
 	public Set<F> put(F field) {
 
-		Map.Entry<Set<F>, State<F, G>> newdata = currentstate.put(field);
-		if (newdata == null) return null;
+		Map.Entry<Set<F>, State<F, G>> newData = currentState.put(field);
+		if (newData == null) return null;
 
-		State<F, G> newstate = newdata.getValue();
-		Set<F> points = newdata.getKey();
+		State<F, G> newState = newData.getValue();
+		Set<F> points = newData.getKey();
 
-		if (field != null && superkoviolation(newstate)) return null; //positional super-ko rule
+		if (field != null && isKoViolatedBy(newState)) return null; //positional super-ko rule
 
-		if (field != null) this.tables.add(newstate.gettable());
+		if (field != null) this.tables.add(newState.getTable());
 		this.moves.addLast(field);
-		this.states.addLast(newstate);
-		this.currentstate = newstate;
+		this.states.addLast(newState);
+		this.currentState = newState;
 
 		return points;
 
@@ -78,7 +78,7 @@ public class Game<F, G> implements IGame<F, G> {
 
 		F lastmove = this.moves.removeLast();
 		State<F, G> laststate = this.states.removeLast();
-		this.currentstate = this.states.peekLast();
+		this.currentState = this.states.peekLast();
 		if (lastmove != null) this.tables.remove(laststate.table);
 
 		return lastmove;
@@ -88,6 +88,6 @@ public class Game<F, G> implements IGame<F, G> {
 
 	@Override
 	public Game<F, G> fork() {
-		return new Game<>(this.currentstate, this.states, this.moves, this.tables);
+		return new Game<>(this.currentState, this.states, this.moves, this.tables);
 	}
 }

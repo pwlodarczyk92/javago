@@ -17,55 +17,55 @@ public class TreeGame<F, G> {
 
 	final protected Logger logger = LoggerFactory.getLogger(TreeGame.class.getName());
 
-	private IGame<F, G> tailboard;
+	private IGame<F, G> rootGame;
 
 	public final Node<F, IState<F, G>> root;
 	public final Function<IState<F, G>, Double> scorer;
 
-	public TreeGame(IGame<F, G> tailboard, Function<IState<F, G>, Double> scorer) {
-		this.tailboard = tailboard;
+	public TreeGame(IGame<F, G> rootGame, Function<IState<F, G>, Double> scorer) {
+		this.rootGame = rootGame;
 		this.scorer = scorer;
-		this.root = makeroot(tailboard, scorer);
+		this.root = _makeRoot(rootGame, scorer);
 	}
 
-	private static <F, G> Node<F, IState<F, G>> makeroot(IGame<F, G> tailboard, Function<IState<F, G>, Double> scorer) {
-		IState<F, G> currentstate = tailboard.getstate();
-		return new Node<>(currentstate, scorer.apply(currentstate), currentstate.getcurrentstone() == Stone.WHITE);
+	private static <F, G> Node<F, IState<F, G>> _makeRoot(IGame<F, G> rootGame, Function<IState<F, G>, Double> scorer) {
+		IState<F, G> rootState = rootGame.getState();
+		return new Node<>(rootState, scorer.apply(rootState), rootState.getCurrentStone() == Stone.WHITE);
 	}
 
 	//--accessors--
-	public Node<F, IState<F, G>> moveto(Node<F, IState<F, G>> node, F field) {
+	public Node<F, IState<F, G>> makeMove(Node<F, IState<F, G>> node, F field) {
 
 		if (node.successors.containsKey(field)) //try to use already existing node
 			return node.successors.get(field);
 
-		Map.Entry<? extends Set<F>, ? extends IState<F, G>> newdata = node.state.put(field); //make move, check if it's valid
-		if (newdata == null) {
-			node.setinvalid(field);
+		Map.Entry<? extends Set<F>, ? extends IState<F, G>> newData = node.state.put(field); //make move, check if it's valid
+		if (newData == null) {
+			node.setInvalid(field);
 			return null;
 		}
 
-		IState<F, G> newstate = newdata.getValue();
+		IState<F, G> newState = newData.getValue();
 
 		if (field != null) { // check super-ko violation
-			if (tailboard.superkoviolation(newstate)) { //tail part check of superko
-				node.setinvalid(field);
+			
+			if (rootGame.isKoViolatedBy(newState)) { //tail part check of ko violation
+				node.setInvalid(field);
 				return null;
 			}
 
-			Node<F, IState<F, G>> previous = node;  //tree part check of superko
-			while (previous != root) {
-				IState<F, G> prevstate = previous.state;
-				if (prevstate.hashCode() == newstate.hashCode() && prevstate.equals(newstate)) {
-					node.setinvalid(field);
+			Node<F, IState<F, G>> nodeBefore = node;  //tree part check of ko violation
+			while (nodeBefore != root) {
+				IState<F, G> stateBefore = nodeBefore.state;
+				if (stateBefore.hashCode() == newState.hashCode() && stateBefore.equals(newState)) {
+					node.setInvalid(field);
 					return null;
 				}
-				previous = previous.predecessor;
+				nodeBefore = nodeBefore.predecessor;
 			}
 		}
 
-		Node<F, IState<F, G>> newnode = node.expand(newstate, field, scorer.apply(newstate));
-		return newnode;
+		return node.expand(newState, field, scorer.apply(newState));
 
 	}
 

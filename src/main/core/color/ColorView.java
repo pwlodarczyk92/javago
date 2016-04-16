@@ -10,21 +10,21 @@ import java.util.Set;
  */
 public interface ColorView<F, G> extends Forkable<IColor<F, G>> {
 
-	public G getgroup(F node);
-
-	public Set<F> getstones(G group);
-	public Set<F> getadjacent(G group);
-	public default F getanystone(G group) {
-		return getstones(group).iterator().next();
+	public G getGroup(F field);
+	public Collection<F> getAdjacency(F field);
+	public default boolean contains(F field) {
+		return getFields().contains(field);
 	}
 
-	public Set<F> getallstones();
-	public Set<G> getallgroups();
-
-	public default boolean contains(F node) {
-		return getallstones().contains(node);
+	public Set<F> getFields(G group);
+	public Set<F> getAdjacents(G group);
+	public default F getAnyField(G group) {
+		return getFields(group).iterator().next();
 	}
-	public Collection<F> adjacency(F node);
+
+	public Set<F> getFields();
+	public Set<G> getGroups();
+
 
 
 }
