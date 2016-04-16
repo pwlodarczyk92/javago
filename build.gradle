@@ -53,7 +53,12 @@ sourceSets {
 }
 
 test {
+    maxHeapSize = "1536m"
     testLogging {
         events "passed", "skipped", "failed"
     }
+}
+
+run {
+    maxHeapSize = "1536m"
 }

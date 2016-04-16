@@ -1,17 +1,21 @@
-package core;
+package core.board;
 
-import core.board.Board;
-import core.color.IntColor;
-import core.primitives.MoveNotAllowed;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Range;
+import core.board.IGame;
+import core.color.Color;
+
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
 /**
  * Created by maxus on 04.03.16.
  */
-public abstract class BoardTest<B extends Board<Integer, ?>> {
+public abstract class GameTest<B extends IGame<Integer, ?>> {
 
 	private static class LinAdj implements Function<Integer, Collection<Integer>> {
 		@Override
@@ -22,12 +26,16 @@ public abstract class BoardTest<B extends Board<Integer, ?>> {
 
 	private Function<Integer, Collection<Integer>> adj = new LinAdj();
 
-	protected abstract B createInstance(Function<Integer, Collection<Integer>> adjacency, IntColor whites, IntColor blacks);
+	protected abstract B createInstance(Collection<Integer> fields,
+										Function<Integer, Collection<Integer>> adjacency,
+										Color<Integer> whites,
+										Color<Integer> blacks);
 
 	@org.junit.Test
 	public final void simpleTest() {
-		B oldboard = createInstance(adj, new IntColor(adj), new IntColor(adj));
-		B board = createInstance(adj, new IntColor(adj), new IntColor(adj));
+		List<Integer> range = ContiguousSet.create(Range.closed(-20, 20), DiscreteDomain.integers()).asList();
+		B oldboard = createInstance(range, adj, new Color<>(adj), new Color<>(adj));
+		B board = createInstance(range, adj, new Color<>(adj), new Color<>(adj));
 
 		assert null != oldboard.put(1);  //   W
 		assert null != oldboard.put(-1); // B W
@@ -53,7 +61,7 @@ public abstract class BoardTest<B extends Board<Integer, ?>> {
 		board.undo(); //BBB WB
 		board.undo(); //BBB  B
 		board.undo(); //BBWWW
-		assert board.getview().equals(oldboard.getview());
+		assert board.getstate().equals(oldboard.getstate());
 	}
 
 }

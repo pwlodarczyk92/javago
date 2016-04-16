@@ -1,5 +1,7 @@
-import server.GoAPI;
-import server.GoBotAPI;
+import implementations.ImmuLazyCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import api.GoAPI;
 
 import static spark.Spark.*;
 
@@ -10,13 +12,11 @@ public class Server {
 
 	//--singleton--
 	private static Server server = null;
+	private Server() {}
 	public static Server getServer() {
-		if (server == null) {
+		if (server == null)
 			server = new Server();
-		}
 		return server;
-	}
-	private Server() {
 	}
 	//--singleton
 
@@ -26,13 +26,13 @@ public class Server {
 		public String path = "/game";
 	}
 
-	private GoAPI api = new GoBotAPI();
+	final private Logger logger = LoggerFactory.getLogger(this.getClass());
+	private GoAPI api = new ImmuLazyCore(19).makeapi();
 	private Config config = new Config();
 	private boolean running = false;
 
 	public void configure(Server.Config config) {
-		if (running)
-			throw new RuntimeException();
+		if (running) throw new RuntimeException();
 		this.config = config;
 	}
 
@@ -46,14 +46,20 @@ public class Server {
 
 	public void run() {
 
-		running = true;
+		if (running) throw new RuntimeException();
+		else running = true;
+
 		port(config.port);
 		if (!config.cors) enableCORS("*", "GET, POST, PUT, DELETE", "*");
+		before((req, res) -> logger.info("spark {} request started: {}", req.requestMethod(), req.queryString()));
+		before((req, res) -> { if (!req.body().equals("")) logger.info("request body: {}", req.body()); });
+		after((req, res) -> logger.info("spark {} request finished: {}", req.requestMethod(), req.queryString()));
 		get(config.path, api::get);
 		put(config.path, api::put);
 		post(config.path, api::post);
 		delete(config.path, api::delete);
 		options(config.path, (req, res) -> "{}");
+
 	}
 
 }
