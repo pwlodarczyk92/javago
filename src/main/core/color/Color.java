@@ -10,9 +10,9 @@ import java.util.function.Function;
 public class Color<Field> implements IColor<Field, Field>{
 
 	//--internal structure--
-	protected final HashMap<Field, Field> roots;
-	protected final HashMap<Field, HashSet<Field>> families;
-	protected final HashMap<Field, HashSet<Field>> liberties;
+	protected HashMap<Field, Field> roots;
+	protected HashMap<Field, Set<Field>> families;
+	protected HashMap<Field, Set<Field>> liberties;
 	//--internal structure--
 
 	//--Field interface--
@@ -28,8 +28,8 @@ public class Color<Field> implements IColor<Field, Field>{
 
 	protected Color(Function<Field, Collection<Field>> adjacency,
 					HashMap<Field, Field> roots,
-					HashMap<Field, HashSet<Field>> families,
-					HashMap<Field, HashSet<Field>> liberties) {
+					HashMap<Field, Set<Field>> families,
+					HashMap<Field, Set<Field>> liberties) {
 		this.adjacency = adjacency;
 		this.roots = roots;
 		this.families = families;
@@ -41,30 +41,35 @@ public class Color<Field> implements IColor<Field, Field>{
 	public Field getgroup(Field node) {
 		return roots.get(node);
 	}
+
+	@Override
+	public Set<Field> getstones(Field root) {
+		return families.get(root);
+	}
 	@Override
 	public Set<Field> getadjacent(Field root) {
 		return liberties.get(root);
 	}
 	@Override
-	public Set<Field> getnodes(Field root) {
-		return families.get(root);
+	public Field getanystone(Field group) {
+		return group;
 	}
+
 	@Override
-	public Set<Field> getallnodes() {
+	public Set<Field> getallstones() {
 		return roots.keySet();
 	}
 	@Override
-	public Field getanynode(Field group) {
-		return group;
-	}
-	@Override
-	public Set<Field> getgroups() {
+	public Set<Field> getallgroups() {
 		return families.keySet();
 	}
+
 	@Override
 	public boolean contains(Field node) {
 		return roots.containsKey(node);
 	}
+	@Override
+	public Collection<Field> adjacency(Field node) { return adjacency.apply(node); }
 	//--accessors--
 
 	//--modifiers--
@@ -73,7 +78,7 @@ public class Color<Field> implements IColor<Field, Field>{
 
 		assert roots.get(root) == root;
 
-		HashSet<Field> family = families.remove(root);
+		Set<Field> family = families.remove(root);
 		family.stream().forEach(roots::remove);
 		liberties.remove(root);
 
@@ -126,13 +131,13 @@ public class Color<Field> implements IColor<Field, Field>{
 		// families and liberties of smaller groups to maxroot's ones
 
 		checkedroots.remove(maxroot);
-		HashSet<Field> maxfamily = families.get(maxroot);
-		HashSet<Field> maxliberties = liberties.get(maxroot);
+		Set<Field> maxfamily = families.get(maxroot);
+		Set<Field> maxliberties = liberties.get(maxroot);
 
 		for (Field subroot: checkedroots) {
 
 			maxliberties.addAll(liberties.remove(subroot));
-			HashSet<Field> nowfam = families.remove(subroot);
+			Set<Field> nowfam = families.remove(subroot);
 			maxfamily.addAll(nowfam);
 
 			for (Field n: nowfam)
@@ -140,33 +145,31 @@ public class Color<Field> implements IColor<Field, Field>{
 
 		}
 
-		// include new node in a new group
-		// include adjacent empty nodes in liberties
-		// exclude new node from liberties
-		// set root for a new stone
+		// include node (the one from args) related changes in the sets
 
 		for (Field adjacent: adjacency.apply(node)) {
 			if (!this.contains(adjacent))
 				maxliberties.add(adjacent);
 		}
+
 		maxliberties.remove(node);
 		maxfamily.add(node);
 		roots.put(node, maxroot);
 
-		return node;
+		return maxroot;
 
 	}
 	// --modifiers--
 
 	// --identity, equality--
 	@Override
-	public Color<Field> copy() {
-		HashMap<Field, HashSet<Field>> nf = new HashMap<>();
-		HashMap<Field, HashSet<Field>> nl = new HashMap<>();
-		for (Map.Entry<Field, HashSet<Field>> f: families.entrySet()) {
+	public Color<Field> fork() {
+		HashMap<Field, Set<Field>> nf = new HashMap<>(families.size());
+		HashMap<Field, Set<Field>> nl = new HashMap<>(liberties.size());
+		for (Map.Entry<Field, Set<Field>> f: families.entrySet()) {
 			nf.put(f.getKey(), new HashSet<>(f.getValue()));
 		}
-		for (Map.Entry<Field, HashSet<Field>> l: liberties.entrySet()) {
+		for (Map.Entry<Field, Set<Field>> l: liberties.entrySet()) {
 			nl.put(l.getKey(), new HashSet<>(l.getValue()));
 		}
 		return new Color<Field>(adjacency,
@@ -181,14 +184,14 @@ public class Color<Field> implements IColor<Field, Field>{
 		if (this == o) return true;
 		if (!(o instanceof Color)) return false;
 
-		Color intColor = (Color) o;
+		Color color = (Color) o;
 
-		return intColor.roots.keySet().equals(roots.keySet());
+		return color.roots.keySet().equals(roots.keySet());
 	}
 
 	@Override
 	public int hashCode() {
-		return roots.size() + 31 * families.size();
+		return roots.keySet().hashCode();
 	}
 	// --identity, equality--
 

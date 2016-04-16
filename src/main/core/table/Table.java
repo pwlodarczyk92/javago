@@ -1,9 +1,8 @@
 package core.table;
 
+import core.Stone;
 import core.color.ColorView;
 import core.color.IColor;
-import core.primitives.MoveNotAllowed;
-import core.primitives.Stone;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,29 +29,12 @@ public class Table<F, G> implements ITable<F, G> {
 
 	//--accessors--
 	@Override
-	public int emptyadjacents(F field) {
-		int i = 0;
-		for(F a: adjacency.apply(field)) {
-			if (getstone(a) == Stone.EMPTY)
-				i+=1;
-		}
-		return i;
+	public Collection<F> getfields() {
+		return fields;
 	}
-
 	@Override
-	public Stone getstone(F field) {
-		if (whites.contains(field)) return Stone.WHITE;
-		if (blacks.contains(field)) return Stone.BLACK;
-		return Stone.EMPTY;
-	}
-
-	@Override
-	public Set<F> getlibs(Stone s, G group) {
-		switch (s) {
-			case WHITE: return getlibs_bygroup(whites, blacks, group);
-			case BLACK: return getlibs_bygroup(blacks, whites, group);
-			default: throw new RuntimeException();
-		}
+	public Collection<F> adjacency(F node) {
+		return adjacency.apply(node);
 	}
 
 	@Override
@@ -63,20 +45,26 @@ public class Table<F, G> implements ITable<F, G> {
 			default: throw new RuntimeException();
 		}
 	}
-
 	@Override
-	public Collection<F> getfields() {
-		return fields;
+	public Stone getstone(F field) {
+		if (whites.contains(field)) return Stone.WHITE;
+		if (blacks.contains(field)) return Stone.BLACK;
+		return Stone.EMPTY;
 	}
 	@Override
-	public Function<F, Collection<F>> getadjacency() {
-		return adjacency;
+	public Set<F> getlibs(Stone s, G group) {
+		switch (s) {
+			case WHITE: return _getlibsbygroup(whites, blacks, group);
+			case BLACK: return _getlibsbygroup(blacks, whites, group);
+			default: throw new RuntimeException();
+		}
 	}
 	//--accessors--
 
-	private Set<F> getlibs_bygroup(IColor<F, G> main, IColor<F, G> substract, G group) {
 
-		HashSet<F> result = new HashSet<>();
+	private Set<F> _getlibsbygroup(IColor<F, G> main, IColor<F, G> substract, G group) {
+
+		HashSet<F> result = new HashSet<>(4);
 
 		for (F lib: main.getadjacent(group)) {
 			if (!substract.contains(lib))
@@ -87,9 +75,9 @@ public class Table<F, G> implements ITable<F, G> {
 
 	}
 
-	private Set<F> getlibs(IColor<F, G> main, IColor<F, G> substract, F field) {
+	private Set<F> _getlibsbyfield(IColor<F, G> main, IColor<F, G> substract, F field) {
 
-		return getlibs_bygroup(main, substract, main.getgroup(field));
+		return _getlibsbygroup(main, substract, main.getgroup(field));
 
 	}
 
@@ -114,7 +102,7 @@ public class Table<F, G> implements ITable<F, G> {
 
 			if (!enemyadj && !playeradj) moveok = true;
 
-			else if (enemyadj && getlibs(enemy, player, adj).size()==1) {
+			else if (enemyadj && _getlibsbyfield(enemy, player, adj).size()==1) {
 				moveok = true;
 				removed_stones.addAll(enemy.remgroup(enemy.getgroup(adj)));
 			}
@@ -123,7 +111,7 @@ public class Table<F, G> implements ITable<F, G> {
 
 		if (!moveok) {
 			for (F adj : adjacent) {
-				if (player.contains(adj) && getlibs(player, enemy, adj).size()>1) {
+				if (player.contains(adj) && _getlibsbyfield(player, enemy, adj).size()>1) {
 					moveok = true;
 					break;
 					//TODO: add tests for correctness of this check
@@ -143,9 +131,9 @@ public class Table<F, G> implements ITable<F, G> {
 
 	// --identity, equality--
 	@Override
-	public Table<F, G> copy() {
-		IColor<F, G> wc = whites.copy();
-		IColor<F, G> bc = blacks.copy();
+	public Table<F, G> fork() {
+		IColor<F, G> wc = whites.fork();
+		IColor<F, G> bc = blacks.fork();
 		return new Table<>(fields, adjacency, wc, bc);
 	}
 
@@ -164,7 +152,7 @@ public class Table<F, G> implements ITable<F, G> {
 
 	@Override
 	public int hashCode() {
-		return 19 * whites.hashCode() + blacks.hashCode();
+		return 31 * whites.hashCode() + blacks.hashCode();
 	}
 	// --identity, equality--
 }
