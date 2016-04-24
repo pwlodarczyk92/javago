@@ -1,7 +1,8 @@
 package score;
 
+import algos.atari.AtariScore;
 import algos.immortal.ImmortalScore;
-import algos.tree.TreeScore;
+import algos.basicscore.BasicScore;
 import core.MoveNotAllowed;
 import core.board.IGame;
 
@@ -19,7 +20,9 @@ public class GameScore {
 				case IMMORTAL:
 					return ImmortalScore.score(game.fork());
 				case SCORE:
-					return TreeScore.score(game.fork());
+					return BasicScore.score(game.fork());
+				case ATARI:
+					return AtariScore.score(game.fork());
 				default: throw new RuntimeException();
 			}
 		} catch (MoveNotAllowed e) {

@@ -1,4 +1,4 @@
-package algos.tree;
+package algos.basicscore;
 
 import core.Stone;
 import core.board.IState;
@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
  * Created by maxus on 10.04.16.
  */
 
-public class TreeImpl {
+public class Basic {
 
-	final static protected Logger logger = LoggerFactory.getLogger(TreeImpl.class.getName());
+	final static protected Logger logger = LoggerFactory.getLogger(Basic.class.getName());
 
 	private static double discreteLibScore(int val) {
 		switch (val) {
@@ -31,8 +31,7 @@ public class TreeImpl {
 
 		int low = (int) Math.floor(libs);
 		int high = (int) Math.ceil(libs);
-		if (low == high)
-			return discreteLibScore(low);
+		if (low == high) return discreteLibScore(low);
 		if (high-low != 1) throw new RuntimeException();
 
 		double lowCoef = high-libs;

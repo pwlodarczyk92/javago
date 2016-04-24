@@ -32,34 +32,34 @@ public abstract class GameTest<G extends IGame<Integer, ?>> {
 	@org.junit.Test
 	public final void simpleTest() {
 		List<Integer> range = ContiguousSet.create(Range.closed(-20, 20), DiscreteDomain.integers()).asList();
-		G oldGame = createInstance(range, adj, new Color<>(adj), new Color<>(adj));
-		G game = createInstance(range, adj, new Color<>(adj), new Color<>(adj));
+		G straightGame = createInstance(range, adj, new Color<>(adj), new Color<>(adj));
+		G undoGame = createInstance(range, adj, new Color<>(adj), new Color<>(adj));
 
-		assert null != oldGame.put(1);  //   W
-		assert null != oldGame.put(-1); // B W
-		assert null != oldGame.put(2);  // B WW
-		assert null != oldGame.put(-2); //BB WW
-		assert null != oldGame.put(0);  //BBWWW
+		assert null != straightGame.put(1);  //   W
+		assert null != straightGame.put(-1); // B W
+		assert null != straightGame.put(2);  // B WW
+		assert null != straightGame.put(-2); //BB WW
+		assert null != straightGame.put(0);  //BBWWW
 
-		assert null != game.put(1);  //   W
-		assert null != game.put(-1); // B W
-		assert null != game.put(2);  // B WW
-		assert null != game.put(-2); //BB WW
-		assert null != game.put(0);  //BBWWW
+		assert null != undoGame.put(1);  //   W
+		assert null != undoGame.put(-1); // B W
+		assert null != undoGame.put(2);  // B WW
+		assert null != undoGame.put(-2); //BB WW
+		assert null != undoGame.put(0);  //BBWWW
 
-		assert null != game.put(3);  //BBB  B
-		assert null != game.put(2);  //BBB WB
-		assert null != game.put(5); //BBB WB B
-		assert null != game.put(4); //BBB W WB
+		assert null != undoGame.put(3);  //BBB  B
+		assert null != undoGame.put(2);  //BBB WB
+		assert null != undoGame.put(5);  //BBB WB B
+		assert null != undoGame.put(4);  //BBB W WB
 
-		assert null == game.put(4); //BBB WB B - repeated
+		assert null == undoGame.put(4); //BBB WB B - repeated
 
-		game.undo(); //BBB WB B
-		game.undo(); //BBB WB
-		game.undo(); //BBB  B
-		game.undo(); //BBWWW
+		undoGame.undo(); //BBB WB B
+		undoGame.undo(); //BBB WB
+		undoGame.undo(); //BBB  B
+		undoGame.undo(); //BBWWW
 
-		assert game.getState().equals(oldGame.getState());
+		assert undoGame.getState().equals(straightGame.getState());
 	}
 
 }
